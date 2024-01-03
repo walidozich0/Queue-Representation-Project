@@ -21,8 +21,8 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{94f645aa-1d63-4834-9512-9b08490c281d}</ProjectGuid>
-    <RootNamespace>VisualQueueProject</RootNamespace>
+    <ProjectGuid>{32a8332f-90a7-4089-badd-9857c173086b}</ProjectGuid>
+    <RootNamespace>QueueTest</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -128,7 +128,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\DataStruct\queue.c" />
-    <ClCompile Include="VisualQueueProject.cpp" />
+    <ClCompile Include="QueueTest.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\DataStruct\queue.h" />

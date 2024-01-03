@@ -24,12 +24,12 @@ int main() {
 
     printf("\nUne file est initialise !\n\n\n");
     system("pause");
-    int quitter, choice, n, rand;
+    int quitter,choice,n,rand;
 
     do {
         nbrElem = file_nombre_elements(maFile);
         system("cls");
-        printf("\nEtat de la file :                                         Nombre d'elements : %d\n\n", nbrElem);
+        printf("\nEtat de la file :                                         Nombre d'elements : %d\n\n",nbrElem);
         afficherFile(maFile);
         menu();
         scanf_s("%d", &choice);
@@ -72,7 +72,7 @@ int main() {
                 printf("\n\n\n\n  MERCI, A PLUS TARD !!\n\n\n\n");
                 break;
             }
-
+            
         default:
             printf("\n\nChoix invalide. Veuillez resaisir un chiffre entre 1 et 6.\n\n\n");
             system("pause");
