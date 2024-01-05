@@ -1,11 +1,19 @@
-# Queue-Representation-Project
+# Projet-ALGO-Queue
 
 ## RoadMap :
 
 ### Structure de donnees en C :
 
-- creer les fonctions de la file (enqueue , dequeue , peek)
+- creer les fonctions de la file
+  - [x] Intialisation de la file
+  - [x] la procedure Enfiler
+  - [x] la procedure Defiler
+  - [x] recuperation de la valeur de la tete et de la queue
+  - [x] vider (suppression) la file
+  - [x] creation d'une file avec des valeurs aleatoire
 - programme console pour tester la structure
+  - [x] interface console avec menu
+  - [x] utilisation des couleurs pour les pointeurs (hesd & tail)
 
 ### Programme windows en C++ pour gerer la structure
 
