@@ -9,7 +9,7 @@ class CVisualQueueDrawerCtrl : public CStatic
 	DECLARE_DYNAMIC(CVisualQueueDrawerCtrl)
 
 public:
-	COLORREF m_clrBackground;
+	
 	CQueueDrawHelper* m_pQueueDrawHelper;
 
 	CVisualQueueDrawerCtrl();

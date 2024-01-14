@@ -1,6 +1,8 @@
 #pragma once
 #include "../DataStruct/queue.h"
 
+#include "AnimationControllerEx.h"
+
 class CQueueHelper
 {
 public:
@@ -47,15 +49,40 @@ private:
 class CVisualQueueDrawerCtrl;
 // class pour mesurer les positons des elements
 
-class CQueueDrawHelper
+int _helperMinPointIndexInPtsSegment(CPoint& pt, CPoint& pt1, CPoint& pt2);//-1,0,1
+int _helperMinPointIndexInPtsArray(CPoint* pPoints, int nCount, CPoint& point);
+void _helperDrawConstrainedLine(CPoint* pPoints, int nCount, CPoint& point, Graphics* pGraphics, Pen* pPen, BOOL bDrawCurve = FALSE);
+
+
+Point _helperConvertStruct(CPoint& pt);
+Rect _helperConvertStruct(CRect& rc);
+void _helperCopyPoints(CPoint* pSrcPoints, Point* pDestPoints, int nCount);
+void _helperCopyRects(CRect* pSrcRects, Rect* pDestRects, int nCount);
+void _helperDrawPoint(CPoint pt, int nWidth, Graphics* pGraphics, CBrush* pBrush);
+
+
+class CQueueDrawHelper : CAnimationControllerEx
 {
 public:
 	CQueueDrawHelper();	
+	virtual ~CQueueDrawHelper();
 	// 
 	void Draw();// CDC : Device Context
 
 	void OnInit(CQueueHelper* pQH, CVisualQueueDrawerCtrl* pWnd);
 	void OnResizeWindow();
+
+	enum AnimMode
+	{
+		amNone = 0,// pas d'animation
+		amPeekOperation,
+		amEnqueueOperation,
+		amDequeueOperation
+	};
+
+	BOOL AnimationEnabled() { return m_bAnimationEnabled; }
+	void EnableAnimation(BOOL bEnable) { m_bAnimationEnabled = bEnable; }
+	void  StartAnimationForPeekOperation();
 
 private:
 	// compute
@@ -101,7 +128,16 @@ private:
 	CRect ComputeEnqueuedDataPos();//15
 
 
-	CRect ComputeQueueExtraZone();//17,18	
+	CRect ComputeQueueExtraZone();//17,18
+
+public:
+	virtual void OnAllAnimationsDone();
+private:	
+	void  _BuildAnimationForPeekOperation();
+	void  _DrawAnimationForPeekOperation(Graphics* pGraphics);
+	
+	
+	
 
 private:
 	CQueueHelper* m_pQueueHelper;	
@@ -139,6 +175,13 @@ private:
 	SolidBrush m_backgroundBrushEnqued;
 	SolidBrush m_backgroundBrushDequed;
 	SolidBrush m_backgroundBrushPeeked;
+
+	BOOL m_bAnimationEnabled;
+	AnimMode  m_AnimMode;
+	Pen m_AnimGeneralPen;
+	Pen m_AnimDataAskingPen;
+	Pen m_AnimArrowPen;
+	SolidBrush m_AnimMovingObjectBrush;
 
 private:
 	void _computeUnitsConvParams();

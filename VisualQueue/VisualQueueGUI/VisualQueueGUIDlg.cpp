@@ -119,12 +119,10 @@ BOOL CVisualQueueGUIDlg::OnInitDialog()
 
 	// TODO: Add extra initialization here
 	((CSpinButtonCtrl*)GetDlgItem(IDC_SPIN_NBR_ELTS))->SetRange(1, m_queueHelper.GetQueueMaxItemsCount());
-
 	
-	m_queueDrawHelper.OnInit(&m_queueHelper, &m_wndDrawCtrl);
-
 	_updateQueueContent();
 	
+	m_queueDrawHelper.OnInit(&m_queueHelper, &m_wndDrawCtrl);	
 
 	return TRUE;  // return TRUE  unless you set the focus to a control
 }
@@ -261,7 +259,7 @@ void CVisualQueueGUIDlg::OnClickedButtonPeek()
 	int nPeekedValue = m_queueHelper.Peek();
 	_updateQueueContent();
 	m_wndDrawCtrl.Invalidate();
-
+	
 	CString strTemp;
 	
 
@@ -272,7 +270,8 @@ void CVisualQueueGUIDlg::OnClickedButtonPeek()
 
 	SetDlgItemText(IDC_BUTTON_PEEK, strTemp);
 
-	
+	if (m_queueDrawHelper.AnimationEnabled())
+		m_queueDrawHelper.StartAnimationForPeekOperation();	
 
 }
 

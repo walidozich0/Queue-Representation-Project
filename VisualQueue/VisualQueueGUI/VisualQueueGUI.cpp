@@ -51,7 +51,12 @@ BOOL CVisualQueueGUIApp::InitInstance()
 
 	CWinApp::InitInstance();
 	
-	
+	//!! necessaire pour les animations
+	if (!AfxOleInit())
+	{
+		AfxMessageBox(_T("AfxOleInit failed"));
+		return FALSE;
+	}
 
 
 	AfxEnableControlContainer();

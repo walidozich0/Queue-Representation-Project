@@ -12,7 +12,7 @@ IMPLEMENT_DYNAMIC(CVisualQueueDrawerCtrl, CStatic)
 
 CVisualQueueDrawerCtrl::CVisualQueueDrawerCtrl()
 {
-	m_clrBackground = RGB(255, 255, 255);
+	
 }
 
 CVisualQueueDrawerCtrl::~CVisualQueueDrawerCtrl()
