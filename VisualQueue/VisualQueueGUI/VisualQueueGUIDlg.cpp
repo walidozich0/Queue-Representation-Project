@@ -83,6 +83,7 @@ BEGIN_MESSAGE_MAP(CVisualQueueGUIDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_BUTTON_GENERATE, &CVisualQueueGUIDlg::OnClickedButtonGenerate)
 	ON_BN_CLICKED(IDC_BUTTON_PEEK, &CVisualQueueGUIDlg::OnClickedButtonPeek)
 	ON_BN_CLICKED(IDC_BTN_PAUSE_RESUME, &CVisualQueueGUIDlg::OnBnClickedBtnPauseResume)
+	ON_BN_CLICKED(IDC_BTN_STOP, &CVisualQueueGUIDlg::OnBnClickedBtnStop)
 END_MESSAGE_MAP()
 
 
@@ -125,7 +126,7 @@ BOOL CVisualQueueGUIDlg::OnInitDialog()
 	
 	_updateQueueContent();
 	
-	m_queueDrawHelper.OnInit(&m_queueHelper, &m_wndDrawCtrl);	
+	m_queueDrawHelper.OnInit(&m_queueHelper, &m_wndDrawCtrl,this);	
 
 	return TRUE;  // return TRUE  unless you set the focus to a control
 }
@@ -210,9 +211,22 @@ void CVisualQueueGUIDlg::OnClickedButtonEnqueue()
 	pEdit->SetSel(0, -1);
 	pEdit->SetFocus();
 
-	m_queueDrawHelper.EnableAnimation(m_bAnimationEnabled);
-	m_wndDrawCtrl.Invalidate();
-	if(m_bAnimationEnabled) m_queueDrawHelper.StartAnimationForEnqueueOperation();
+
+
+	
+	m_wndDrawCtrl.Invalidate();	
+
+	if (m_queueHelper.GetQueueItemsCount() > 1)
+	{ 
+		m_queueDrawHelper.EnableAnimation(m_bAnimationEnabled);
+		if (m_queueDrawHelper.AnimationEnabled())
+		{
+			enableQueueCtrls(FALSE);
+			m_queueDrawHelper.StartAnimationForEnqueueOperation();
+		}
+	}
+	
+	
 }
 
 void CVisualQueueGUIDlg::OnClickedButtonDequeue()
@@ -275,9 +289,17 @@ void CVisualQueueGUIDlg::OnClickedButtonPeek()
 
 	SetDlgItemText(IDC_BUTTON_PEEK, strTemp);
 
-	m_queueDrawHelper.EnableAnimation(m_bAnimationEnabled);
+	
+	{
+		m_queueDrawHelper.EnableAnimation(m_bAnimationEnabled);
 
-	if (m_queueDrawHelper.AnimationEnabled()) m_queueDrawHelper.StartAnimationForPeekOperation();	
+		if (m_queueDrawHelper.AnimationEnabled())
+		{
+			enableQueueCtrls(FALSE);
+			m_queueDrawHelper.StartAnimationForPeekOperation();
+		}
+	}
+	
 
 }
 
@@ -299,9 +321,35 @@ void CVisualQueueGUIDlg::_updateQueueContent()
 
 }
 
+void CVisualQueueGUIDlg::enableAnimCtrls(BOOL bEnable)
+{
+	GetDlgItem(IDC_BTN_PAUSE_RESUME)->EnableWindow(bEnable);
+}
+
+void CVisualQueueGUIDlg::enableQueueCtrls(BOOL bEnable)
+{
+	GetDlgItem(IDC_EDIT_ENQUEUE_VAL)->EnableWindow(bEnable);
+	GetDlgItem(IDC_EDIT_RAND_NBR_ELTS)->EnableWindow(bEnable);
+	GetDlgItem(IDC_SPIN_NBR_ELTS)->EnableWindow(bEnable);
+	GetDlgItem(IDC_BUTTON_ENQUEUE)->EnableWindow(bEnable);
+	GetDlgItem(IDC_BUTTON_DEQUEUE)->EnableWindow(bEnable);
+	GetDlgItem(IDC_BUTTON_CLEAR)->EnableWindow(bEnable);
+	GetDlgItem(IDC_BUTTON_GENERATE)->EnableWindow(bEnable);
+	GetDlgItem(IDC_BUTTON_PEEK)->EnableWindow(bEnable);	
+
+}
+
 
 void CVisualQueueGUIDlg::OnBnClickedBtnPauseResume()
 {
 	if(m_queueDrawHelper.IsAnimationInProgress()) m_queueDrawHelper.PauseAllAnimations();
 	else m_queueDrawHelper.ResumeAllAnimations();
+}
+
+
+void CVisualQueueGUIDlg::OnBnClickedBtnStop()
+{
+	m_queueDrawHelper.StopAllAnimations();
+	m_queueDrawHelper.m_AnimMode = CQueueDrawHelper::AnimMode::amNone;
+	m_wndDrawCtrl.Invalidate();
 }

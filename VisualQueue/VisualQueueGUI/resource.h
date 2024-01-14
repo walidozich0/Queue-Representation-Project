@@ -22,8 +22,9 @@
 #define IDC_DRAW_ZONE                   1013
 #define IDC_COMBO1                      1014
 #define IDC_CHK_ANIMATIONS_ENABLED      1015
-#define IDC_BUTTON1                     1016
 #define IDC_BTN_PAUSE_RESUME            1016
+#define IDC_BTN_PAUSE_RESUME2           1017
+#define IDC_BTN_STOP                    1017
 
 // Next default values for new objects
 // 

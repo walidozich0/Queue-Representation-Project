@@ -47,6 +47,7 @@ private:
 
 
 class CVisualQueueDrawerCtrl;
+class CVisualQueueGUIDlg;
 // class pour mesurer les positons des elements
 
 int _helperMinPointIndexInPtsSegment(CPoint& pt, CPoint& pt1, CPoint& pt2);//-1,0,1
@@ -69,7 +70,7 @@ public:
 	// 
 	void Draw();// CDC : Device Context
 
-	void OnInit(CQueueHelper* pQH, CVisualQueueDrawerCtrl* pWnd);
+	void OnInit(CQueueHelper* pQH, CVisualQueueDrawerCtrl* pWnd, CVisualQueueGUIDlg* pDlg);
 	void OnResizeWindow();
 
 	enum AnimMode
@@ -79,6 +80,7 @@ public:
 		amEnqueueOperation,
 		amDequeueOperation
 	};
+	AnimMode  m_AnimMode;
 
 	BOOL AnimationEnabled() { return m_bAnimationEnabled; }
 	void EnableAnimation(BOOL bEnable) { m_bAnimationEnabled = bEnable; }
@@ -146,6 +148,7 @@ private:
 private:
 	CQueueHelper* m_pQueueHelper;	
 	CWnd* m_pDrawingWindow;
+	CVisualQueueGUIDlg* m_pMainWnd;
 	
 	CRect m_rcDrawingWindowLogicalPosAndSize;
 	CRect m_rcDrawingWindowPhysicalPosAndSize;
@@ -181,7 +184,7 @@ private:
 	SolidBrush m_backgroundBrushPeeked;
 
 	BOOL m_bAnimationEnabled;
-	AnimMode  m_AnimMode;
+	
 	Pen m_AnimGeneralPen;
 	Pen m_AnimDataAskingPen;
 	Pen m_AnimArrowPen;
@@ -192,5 +195,6 @@ private:
 	
 	CRect _logicalUnits2DeviceUnits(CRect* pRC);
 	CPoint _logicalUnits2DeviceUnits(CPoint* pPt);
+	int	_logicalUnits2DeviceUnitsX(int nInput);
 
 };
