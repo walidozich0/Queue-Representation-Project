@@ -16,6 +16,7 @@ public:
 	virtual ~CVisualQueueDrawerCtrl();
 
 	virtual void DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct);
+	BOOL OnEraseBkgnd(CDC* pDC);
 	
 
 protected:

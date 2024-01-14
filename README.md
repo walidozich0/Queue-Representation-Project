@@ -20,12 +20,6 @@
 - [x] Gerer la structure a partir de l'interface windows, application MFC (https://learn.microsoft.com/en-us/cpp/mfc/mfc-desktop-applications?view=msvc-170)
 - [x] afficher la structure en texte au debut
 
-### Implementation des etapes intermediaires :
-
-> cette etape est necessaire pour l'etape animation
-
-- lister les etapes en ordre chronologique et les afficher
-
 ### Dessin graphique :
 
 - utilisant GDI+ (documentation : https://learn.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-gdi-start)

@@ -32,9 +32,15 @@ void CVisualQueueDrawerCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 
 }
 
+BOOL CVisualQueueDrawerCtrl::OnEraseBkgnd(CDC* pDC)
+{
+	//return CStatic::OnEraseBkgnd(pDC);
+	return FALSE;
+}
+
 
 BEGIN_MESSAGE_MAP(CVisualQueueDrawerCtrl, CStatic)
-
+	ON_WM_ERASEBKGND()
 END_MESSAGE_MAP()
 
 	

@@ -160,7 +160,12 @@ CQueueDrawHelper::CQueueDrawHelper():
 
 void CQueueDrawHelper::Draw(CDC* pDC, CRect* pDrawCtrlRect)
 {
-	Graphics graphics(pDC->GetSafeHdc());
+	//Graphics graphics(pDC->GetSafeHdc());
+	
+	CMemDC memDC(*pDC, *pDrawCtrlRect);
+	Graphics graphics(memDC.GetDC());
+	
+	
 
 	graphics.SetSmoothingMode(SmoothingModeAntiAlias);
 	//graphics.SetSmoothingMode(SmoothingModeHighQuality);
@@ -208,10 +213,14 @@ void CQueueDrawHelper::Draw(CDC* pDC, CRect* pDrawCtrlRect)
 	
 	// dequeue zone
 	{
+		CString strDequedValue;
+		strDequedValue.Format(_T("%02d"), m_pQueueHelper->GetLastDequeuedValue());
 		CRect rcLogical = ComputeDequeueDataPos();
 		CRect rcPhysical = _logicalUnits2DeviceUnits(&rcLogical);
-		graphics.FillEllipse(&backgroundBrush3, rcPhysical.left, rcPhysical.top, rcPhysical.Width(), rcPhysical.Height());
-		graphics.DrawEllipse(&ValuePen, rcPhysical.left, rcPhysical.top, rcPhysical.Width(), rcPhysical.Height());
+		graphics.FillRectangle(&backgroundBrush3, rcPhysical.left, rcPhysical.top, rcPhysical.Width(), rcPhysical.Height());
+		graphics.DrawRectangle(&ValuePen, rcPhysical.left, rcPhysical.top, rcPhysical.Width(), rcPhysical.Height());
+		graphics.DrawString(strDequedValue, -1, &font,
+		RectF(rcPhysical.left, rcPhysical.top, rcPhysical.Width(), rcPhysical.Height()), NULL, &solidBrush);
 	}
 
 	{
@@ -244,16 +253,26 @@ void CQueueDrawHelper::Draw(CDC* pDC, CRect* pDrawCtrlRect)
 	}
 
 	{
+		CString strPeekedValue;
+		strPeekedValue.Format(_T("%02d"), m_pQueueHelper->GetLastPeekedValue());
 		CRect rcLogical = ComputePeekedDataPos();
 		CRect rcPhysical = _logicalUnits2DeviceUnits(&rcLogical);
+		graphics.FillRectangle(&backgroundBrush3, rcPhysical.left, rcPhysical.top, rcPhysical.Width(), rcPhysical.Height());
 		graphics.DrawRectangle(&ValuePen, rcPhysical.left, rcPhysical.top, rcPhysical.Width(), rcPhysical.Height());
+		graphics.DrawString(strPeekedValue, -1, &font,
+		RectF(rcPhysical.left, rcPhysical.top, rcPhysical.Width(), rcPhysical.Height()), NULL, &solidBrush);
 	}
 
 	
 	{
+		CString strEnquedValue;
+		strEnquedValue.Format(_T("%02d"), m_pQueueHelper->GetLastEnqueuedValue());
 		CRect rcLogical = ComputeEnqueuedDataPos();
 		CRect rcPhysical = _logicalUnits2DeviceUnits(&rcLogical);
+		graphics.FillRectangle(&backgroundBrush3, rcPhysical.left, rcPhysical.top, rcPhysical.Width(), rcPhysical.Height());
 		graphics.DrawRectangle(&ValuePen, rcPhysical.left, rcPhysical.top, rcPhysical.Width(), rcPhysical.Height());
+		graphics.DrawString(strEnquedValue, -1, &font,
+		RectF(rcPhysical.left, rcPhysical.top, rcPhysical.Width(), rcPhysical.Height()), NULL, &solidBrush);
 	}
 
 	//for (int i = 0; i < m_pQueueHelper->GetQueueItemsCount(); i++)
@@ -267,24 +286,29 @@ void CQueueDrawHelper::Draw(CDC* pDC, CRect* pDrawCtrlRect)
 	for (int i = 0; i < m_pQueueHelper->GetQueueItemsCount(); i++)
 	{
 		CString strCurrentData = m_pQueueHelper->GetTextRepresentationEx().Mid(i * 10, 10);
+		
 		ASSERT(strCurrentData.GetLength() == 10);
 
 		{
 			CRect rcLogical = ComputeQueueElementPos(i);
 			CRect rcPhysical = _logicalUnits2DeviceUnits(&rcLogical);
+			graphics.FillRectangle(&backgroundBrush1, rcPhysical.left, rcPhysical.top, rcPhysical.Width(), rcPhysical.Height());
 			graphics.DrawRectangle(&normalPen, rcPhysical.left, rcPhysical.top, rcPhysical.Width(), rcPhysical.Height());
-			graphics.DrawString(strCurrentData.Left(4), -1, &font,
-				RectF(rcPhysical.left, rcPhysical.top, rcPhysical.Width(), rcPhysical.Height()), NULL, &solidBrush);
-		}
+			}
 		{
 			CRect rcLogical = ComputeQueueElementAdrPos(i);
 			CRect rcPhysical = _logicalUnits2DeviceUnits(&rcLogical);
+			graphics.FillRectangle(&backgroundBrush1, rcPhysical.left, rcPhysical.top, rcPhysical.Width(), rcPhysical.Height());
 			graphics.DrawRectangle(&normalPen, rcPhysical.left, rcPhysical.top, rcPhysical.Width(), rcPhysical.Height());
+			graphics.DrawString(strCurrentData.Left(4), -1, &font,
+			RectF(rcPhysical.left, rcPhysical.top, rcPhysical.Width(), rcPhysical.Height()), NULL, &solidBrush);
+
 		}
 		{
 			CRect rcLogical = ComputeQueueElementDataPos(i);
 			CRect rcPhysical = _logicalUnits2DeviceUnits(&rcLogical);
-			graphics.DrawEllipse(&normalPen, rcPhysical.left, rcPhysical.top, rcPhysical.Width(), rcPhysical.Height());					
+			graphics.FillRectangle(&backgroundBrush3, rcPhysical.left, rcPhysical.top, rcPhysical.Width(), rcPhysical.Height());
+			graphics.DrawRectangle(&ValuePen, rcPhysical.left, rcPhysical.top, rcPhysical.Width(), rcPhysical.Height());
 			graphics.DrawString(strCurrentData.Mid(4,2), -1, &font,
 				RectF(rcPhysical.left, rcPhysical.top, rcPhysical.Width(), rcPhysical.Height()), NULL, &solidBrush);
 			
@@ -294,10 +318,23 @@ void CQueueDrawHelper::Draw(CDC* pDC, CRect* pDrawCtrlRect)
 		{
 			CRect rcLogical = ComputeQueueElementNextAdrPos(i);
 			CRect rcPhysical = _logicalUnits2DeviceUnits(&rcLogical);
-			graphics.DrawRectangle(&normalPen, rcPhysical.left, rcPhysical.top, rcPhysical.Width(), rcPhysical.Height());
-			graphics.DrawString(strCurrentData.Right(4), -1, &font,
+			CString strCompareZero = _T("0000");
+
+			if (strCurrentData.Right(4)==strCompareZero)
+			{
+				graphics.FillRectangle(&backgroundBrush2, rcPhysical.left, rcPhysical.top, rcPhysical.Width(), rcPhysical.Height());
+				graphics.DrawRectangle(&normalPen, rcPhysical.left, rcPhysical.top, rcPhysical.Width(), rcPhysical.Height());
+				graphics.DrawLine(&normalPen, rcPhysical.left, rcPhysical.top, rcPhysical.right, rcPhysical.bottom);
+			}
+			else {
+				graphics.FillRectangle(&backgroundBrush2, rcPhysical.left, rcPhysical.top, rcPhysical.Width(), rcPhysical.Height());
+				graphics.DrawRectangle(&normalPen, rcPhysical.left, rcPhysical.top, rcPhysical.Width(), rcPhysical.Height());
+				graphics.DrawString(strCurrentData.Right(4), -1, &font,
 				RectF(rcPhysical.left, rcPhysical.top, rcPhysical.Width(), rcPhysical.Height()), NULL, &solidBrush);
-		}
+			}
+			
+			
+			}
 
 		if (i != (m_pQueueHelper->GetQueueItemsCount()-1))
 		{
@@ -339,7 +376,10 @@ void CQueueDrawHelper::Draw(CDC* pDC, CRect* pDrawCtrlRect)
 	{
 		CRect rcLogical = ComputeHeadPointerPos();
 		CRect rcPhysical = _logicalUnits2DeviceUnits(&rcLogical);
+		graphics.FillRectangle(&backgroundBrush2, rcPhysical.left, rcPhysical.top, rcPhysical.Width(), rcPhysical.Height());
 		graphics.DrawRectangle(&normalPen, rcPhysical.left, rcPhysical.top, rcPhysical.Width(), rcPhysical.Height());
+		graphics.DrawString(_T("Head"), -1, &font,
+			RectF(rcPhysical.left, rcPhysical.top, rcPhysical.Width(), rcPhysical.Height()), NULL, &solidBrush);
 	}
 
 	{
@@ -359,7 +399,10 @@ void CQueueDrawHelper::Draw(CDC* pDC, CRect* pDrawCtrlRect)
 	{
 		CRect rcLogical = ComputeTailPointerPos();
 		CRect rcPhysical = _logicalUnits2DeviceUnits(&rcLogical);
+		graphics.FillRectangle(&backgroundBrush2, rcPhysical.left, rcPhysical.top, rcPhysical.Width(), rcPhysical.Height());
 		graphics.DrawRectangle(&normalPen, rcPhysical.left, rcPhysical.top, rcPhysical.Width(), rcPhysical.Height());
+		graphics.DrawString(_T("Tail"), -1, &font,
+			RectF(rcPhysical.left, rcPhysical.top, rcPhysical.Width(), rcPhysical.Height()), NULL, &solidBrush);
 	}
 
 	{
