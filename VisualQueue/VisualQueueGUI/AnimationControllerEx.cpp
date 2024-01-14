@@ -394,6 +394,8 @@ BOOL CAnimationControllerEx::AnimateSequence(WORD wSeqId, int nRepeat)
 	}
 
 	VERIFY(ScheduleGroup(nStartGroupId));
+
+	return TRUE;
 }
 
 void CAnimationControllerEx::CleanupSequenceGroups(WORD wSeqId)

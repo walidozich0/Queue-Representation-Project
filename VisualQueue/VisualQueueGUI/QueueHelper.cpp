@@ -57,6 +57,7 @@ int CQueueHelper::Peek()
 {
 	if (!IsQueueInitialized()) return -1;
 	m_nLastPeekedValue = ::peek(m_pQueue);
+	return m_nLastPeekedValue;
 }
 int CQueueHelper::Dequeue()
 {
@@ -74,6 +75,7 @@ int CQueueHelper::Dequeue()
 
 	m_nLastDequeuedValue = ::Dequeue(m_pQueue);
 	_generateTextData();// regenerer la represenattion textuelle
+	return m_nLastDequeuedValue;
 }
 int CQueueHelper::GetQueueItemsCount()
 {
@@ -1864,7 +1866,7 @@ void CQueueDrawHelper::Draw()
 		graphics.DrawRectangle(&m_normalPen, rcPhysical.left, rcPhysical.top, rcPhysical.Width(), rcPhysical.Height());
 		/*graphics.DrawString(_T("Head"), -1, &m_font,
 			RectF(rcPhysical.left, rcPhysical.top, rcPhysical.Width(), rcPhysical.Height()), NULL, &m_solidBrush);*/
-		_helperDrawTextCentered(&graphics, _T("Head"), -1, rcPhysical, &m_font, &m_solidBrush);
+		_helperDrawTextCentered(&graphics, _T("Tete"), -1, rcPhysical, &m_font, &m_solidBrush);
 	}
 	{
 		if (m_pQueueHelper->GetQueueItemsCount() > 0)
@@ -1906,7 +1908,7 @@ void CQueueDrawHelper::Draw()
 		graphics.DrawRectangle(&m_normalPen, rcPhysical.left, rcPhysical.top, rcPhysical.Width(), rcPhysical.Height());
 		/*graphics.DrawString(_T("Tail"), -1, &m_font,
 			RectF(rcPhysical.left, rcPhysical.top, rcPhysical.Width(), rcPhysical.Height()), NULL, &m_solidBrush);*/
-		_helperDrawTextCentered(&graphics, _T("Tail"), -1, rcPhysical, &m_font, &m_solidBrush);
+		_helperDrawTextCentered(&graphics, _T("Queue"), -1, rcPhysical, &m_font, &m_solidBrush);
 	}
 	{
 		if (m_pQueueHelper->GetQueueItemsCount() > 0)
