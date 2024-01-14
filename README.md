@@ -17,8 +17,8 @@
 
 ### Programme windows en C++ pour gerer la structure
 
-- Gerer la structure a partir de l'interface windows, application MFC (https://learn.microsoft.com/en-us/cpp/mfc/mfc-desktop-applications?view=msvc-170)
-- afficher la structure en texte au debut
+- [x] Gerer la structure a partir de l'interface windows, application MFC (https://learn.microsoft.com/en-us/cpp/mfc/mfc-desktop-applications?view=msvc-170)
+- [x] afficher la structure en texte au debut
 
 ### Implementation des etapes intermediaires :
 

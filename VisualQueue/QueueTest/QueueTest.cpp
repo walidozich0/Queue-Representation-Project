@@ -19,7 +19,7 @@ void menu() {
 
 int main() {
 
-    Queue* maFile = QueueInit();
+    File* maFile = initialiser();
     int nbrElem;
 
     printf("\nUne file est initialise !\n\n\n");
@@ -27,35 +27,35 @@ int main() {
     int quitter,choice,n,rand;
 
     do {
-        nbrElem = Queue_items_count(maFile);
+        nbrElem = file_nombre_elements(maFile);
         system("cls");
         printf("\nEtat de la file :                                         Nombre d'elements : %d\n\n",nbrElem);
-        Queue_Display(maFile);
+        afficherFile(maFile);
         menu();
         scanf_s("%d", &choice);
         switch (choice) {
         case 1:
             printf("\nEntrez la valeur: \n\n\n");
             scanf_s("%d", &n);
-            Enqueue(maFile, n);
+            enfiler(maFile, n);
             break;
         case 2:
-            printf("\nJe defile %d\n\n\n", Dequeue(maFile));
+            printf("\nJe defile %d\n\n\n", defiler(maFile));
             system("pause");
             break;
         case 3:
-            DisplayHeadTail(maFile);
+            afficherTeteEtQueue(maFile);
             system("pause");
 
             break;
         case 4:
-            Queue_EmptyFree(maFile);
+            file_vider(maFile);
             break;
         case 5:
 
             printf("\nCombien d'elements vous voulez ajouter :\n");
             scanf_s("%d", &rand);
-            Queue_RandFill(maFile, rand);
+            file_ajouter_aleatoires(maFile, rand);
 
             break;
         case 6:

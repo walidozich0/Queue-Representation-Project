@@ -6,53 +6,53 @@
 
 
 // Fontion pour intialiser une file
-Queue* QueueInit()
+File* initialiser()
 {
-    Queue* queue = malloc(sizeof(*queue));
+    File* file = malloc(sizeof(*file));
 
-    if (queue == NULL)
+    if (file == NULL)
     {
         return -1;
     }
 
-    queue->m_pHeadEntry = NULL;
-    queue->m_pTailEntry = NULL;
-    queue->m_nItemsCount = 0;
+    file->premier = NULL;
+    file->dernier = NULL;
+    file->nb_elements = 0;
 
-    return queue;
+    return file;
 }
 
 // La procedure enfiler 
-void Enqueue(Queue* queue, int nEntryValue)
+void enfiler(File* file, int nvNombre)
 {
-    QueueEntry* pNewEntry = malloc(sizeof(*pNewEntry));
+    Element* nouveau = malloc(sizeof(*nouveau));
 
-    if (queue == NULL || pNewEntry == NULL) //verifier l'existance de la file
+    if (file == NULL || nouveau == NULL) //verifier l'existance de la file
     {
         return -1;
     }
 
-    pNewEntry->m_nData = nEntryValue;
-    pNewEntry->m_pNextEntry = NULL;
+    nouveau->nombre = nvNombre;
+    nouveau->suivant = NULL;
 
-    if (queue->m_pHeadEntry != NULL) /* La file n'est pas vide */
+    if (file->premier != NULL) /* La file n'est pas vide */
     {
         
-        queue->m_pTailEntry->m_pNextEntry = pNewEntry;
+        file->dernier->suivant = nouveau;
     }
     else /* La file est vide, notre élément est le premier */
     {
-        queue->m_pHeadEntry = pNewEntry;
+        file->premier = nouveau;
     }
 
-    queue->m_pTailEntry = pNewEntry;
-    queue->m_nItemsCount++;
+    file->dernier = nouveau;
+    file->nb_elements++;
 }
 
 // La procedure defiler 
-int Dequeue(Queue* queue) 
+int defiler(File* file) 
 {
-    if (queue == NULL) //verifier l'existance de la file
+    if (file == NULL) //verifier l'existance de la file
     {
         return -1;
     }
@@ -60,33 +60,39 @@ int Dequeue(Queue* queue)
     int nombreDefile = -1;
 
  
-    if (queue->m_pHeadEntry != NULL)   /* On vérifie s'il y a quelque chose à défiler */
+    if (file->premier != NULL)   /* On vérifie s'il y a quelque chose à défiler */
     {
-        QueueEntry* elementDefile = queue->m_pHeadEntry;
+        Element* elementDefile = file->premier;
 
-        nombreDefile = elementDefile->m_nData;
-        queue->m_pHeadEntry = elementDefile->m_pNextEntry;
+        nombreDefile = elementDefile->nombre;
+        file->premier = elementDefile->suivant;
         free(elementDefile);
-        queue->m_nItemsCount--;
+        file->nb_elements--;
     }
 
     return nombreDefile;
 }
 
-int peek(Queue* queue)
+int peek(File* file)
 {
-    if (queue == NULL) //verifier l'existance de la file
+    if (file == NULL) //verifier l'existance de la file
     {
         return -1;
     }
 
-    return queue->m_pHeadEntry ? queue->m_pHeadEntry->m_nData : -1;
+    if (file->premier != NULL)   /* On vérifie s'il y a quelque chose à défiler */
+    {
+        Element* elementDefile = file->premier;
+        return elementDefile->nombre;
+    }
+    else
+        return -1;
 }
 
 
 // Fonction pour vérifier si la file est vide
-int Queue_IsEmpty(Queue* queue) {
-    if (queue->m_pHeadEntry == NULL) {
+int file_est_vide(File* file) {
+    if (file->premier == NULL) {
         return 1;
     }
     else {
@@ -95,17 +101,17 @@ int Queue_IsEmpty(Queue* queue) {
 }
 
 
-void Queue_Display(Queue* queue)
+void afficherFile(File* file)
 {
-    if (queue == NULL) //verifier l'existance de la file
+    if (file == NULL) //verifier l'existance de la file
     {
-        return -1;
+        exit(EXIT_FAILURE);
     }
 
     // Ma façon de presenter la file dans la console
     printf("\n      ------------------------------------------------------------\n");
 
-    if (Queue_IsEmpty(queue) == 1) {
+    if (file_est_vide(file) == 1) {
         printf("\n        File vide\n");
         printf("\n       ");
         SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 113);
@@ -117,15 +123,15 @@ void Queue_Display(Queue* queue)
         SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
     }
     else {
-        QueueEntry* element = queue->m_pHeadEntry;
+        Element* element = file->premier;
         printf("\n       ");
         SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 113);
         printf(" head ");
         while (element != NULL)
         {
             SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
-            printf("-> (@=%x) %d (@suiv=%x)",(UINT)element, element->m_nData, (UINT)element->m_pNextEntry); // representer le contenu de l'element avec son adresse et l adresse du suivant
-            element = element->m_pNextEntry;
+            printf("-> (@=%x) %d (@suiv=%x)",(UINT)element, element->nombre, (UINT)element->suivant); // representer le contenu de l'element avec son adresse et l adresse du suivant
+            element = element->suivant;
         }
         printf(" <- ");
         SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 116);
@@ -137,52 +143,52 @@ void Queue_Display(Queue* queue)
     printf("\n      ------------------------------------------------------------\n");
 }
 
-void DisplayHeadTail(Queue* queue)
+void afficherTeteEtQueue(File* file)
 {
-    if (queue == NULL)  //verifier l'existance de la file
+    if (file == NULL)  //verifier l'existance de la file
     {
         return -1;
     }
 
 
-    QueueEntry* FirstElt = queue->m_pHeadEntry;
-    QueueEntry* LastElt = queue->m_pTailEntry;
+    Element* premierE = file->premier;
+    Element* dernierE = file->dernier;
 
     //affichage
     SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 113);
-    printf("\n Head: %d \n\n", FirstElt->m_nData);
+    printf("\n Head: %d \n\n", premierE->nombre);
     SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 116);
-    printf(" TaiL: %d \n\n", LastElt->m_nData);
+    printf(" TaiL: %d \n\n", dernierE->nombre);
     SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
 }
 
 // Fonction pour vider la file
-void Queue_EmptyFree(Queue* queue) {
-    QueueEntry* current = queue->m_pHeadEntry;
-    QueueEntry* m_pNextEntry;
+void file_vider(File* file) {
+    Element* courant = file->premier;
+    Element* suivant;
 
-    while (current != NULL) {
-        m_pNextEntry = current->m_pNextEntry;
-        free(current);
-        current = m_pNextEntry;
+    while (courant != NULL) {
+        suivant = courant->suivant;
+        free(courant);
+        courant = suivant;
     }
 
-    queue->m_nItemsCount = 0;
+    file->nb_elements = 0;
 
-    queue->m_pHeadEntry = NULL;
+    file->premier = NULL;
 }
 
 // Fonction pour compter le nombre d'éléments dans la file
-int Queue_items_count(Queue* queue) {
-    return queue->m_nItemsCount;
+int file_nombre_elements(File* file) {
+    return file->nb_elements;
 }
 
 // Fonction pour ajouter des valeurs aléatoires à la file
-void Queue_RandFill(Queue* queue, int nItemsCount) {
-    Queue_EmptyFree(queue);
+void file_ajouter_aleatoires(File* file, int nb_elements) {
+    file_vider(file);
     srand(time(NULL));
-    for (int i = 0; i < nItemsCount; i++) {
-        int RandomValue = rand() % 100 ; // générer une valeur aléatoire entre 1 et 200
-        Enqueue(queue, RandomValue);     // ajouter la valeur aléatoire à la file
+    for (int i = 0; i < nb_elements; i++) {
+        int valeur_aleatoire = rand() % 100 ; // générer une valeur aléatoire entre 1 et 200
+        enfiler(file, valeur_aleatoire);     // ajouter la valeur aléatoire à la file
     }
 }

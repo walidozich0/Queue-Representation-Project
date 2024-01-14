@@ -5,31 +5,31 @@
 extern "C" {
 #endif
 
-typedef struct QueueEntry QueueEntry;
-struct QueueEntry
+typedef struct Element Element;
+struct Element
 {
-    int m_nData;
-    QueueEntry* m_pNextEntry;
+    int nombre;
+    Element* suivant;
 };
 
-typedef struct Queue Queue;
-struct Queue
+typedef struct File File;
+struct File
 {
-    QueueEntry* m_pHeadEntry;
-    QueueEntry* m_pTailEntry;
-    int m_nItemsCount;
+    Element* premier;
+    Element* dernier;
+    int nb_elements;
 };
 
-Queue* QueueInit();
-void Enqueue(Queue* queue, int nvNombre);
-int Dequeue(Queue* queue);
-int peek(Queue* queue);
-void Queue_Display(Queue* queue);
-void DisplayHeadTail(Queue* queue);
-int Queue_IsEmpty(Queue* queue);
-void Queue_EmptyFree(Queue* queue);
-int Queue_items_count(Queue* queue);
-void Queue_RandFill(Queue* queue, int nItemsCount);
+File* initialiser();
+void enfiler(File* file, int nvNombre);
+int defiler(File* file);
+int peek(File* file);
+void afficherFile(File* file);
+void afficherTeteEtQueue(File* file);
+int file_est_vide(File* file);
+void file_vider(File* file);
+int file_nombre_elements(File* file);
+void file_ajouter_aleatoires(File* file, int nb_elements);
 
 #ifdef __cplusplus
 }
