@@ -23,13 +23,12 @@ void CVisualQueueDrawerCtrl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 {	
 	CDC dc;
 	dc.Attach(lpDrawItemStruct->hDC);
-	;
+	
 
 	if (m_pQueueDrawHelper)
 	{
-		m_pQueueDrawHelper->Draw(&dc, &CRect(lpDrawItemStruct->rcItem));
+		m_pQueueDrawHelper->Draw();
 	}
-
 }
 
 BOOL CVisualQueueDrawerCtrl::OnEraseBkgnd(CDC* pDC)

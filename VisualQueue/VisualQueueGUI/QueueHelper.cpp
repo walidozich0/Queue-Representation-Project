@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "QueueHelper.h"
+#include "VisualQueueDrawerCtrl.h"
 
 
 
@@ -149,26 +150,22 @@ CQueueDrawHelper::CQueueDrawHelper():
 	m_nDataWidth = 4;
 	m_nDataHeight = 4; 
 	m_nDataDistanceFromQueue = 16;
-
 	m_nElementWidth = 8;
 	m_nElementHeight = 16;
 	m_nElementAdrHeight = 4; 
+
 	m_DrawUnitLength = CSize(0, 0);
-	
+	m_rcDrawingWindowLogicalPosAndSize = m_rcDrawingWindowPhysicalPosAndSize = CRect();
+
 }
 
-void CQueueDrawHelper::Draw(CDC* pDC, CRect* pDrawCtrlRect)
-{
-	//Graphics graphics(pDC->GetSafeHdc());
-	
-	CMemDC memDC(*pDC, *pDrawCtrlRect);
-	Graphics graphics(memDC.GetDC());
-	
-	
+void CQueueDrawHelper::Draw()
+{	
+	ASSERT(m_pDrawingWindow && m_pDrawingWindow->GetSafeHwnd());
 
+	CMemDC memDC((*m_pDrawingWindow->GetDC()), m_rcDrawingWindowPhysicalPosAndSize);
+	Graphics graphics(memDC.GetDC());
 	graphics.SetSmoothingMode(SmoothingModeAntiAlias);
-	//graphics.SetSmoothingMode(SmoothingModeHighQuality);
-	//graphics.SetSmoothingMode(SmoothingModeHighSpeed);
 	
 
 	// temp
@@ -176,8 +173,6 @@ void CQueueDrawHelper::Draw(CDC* pDC, CRect* pDrawCtrlRect)
 	FontFamily   fontFamily(L"Tahoma");
 	Gdiplus:: Font font(&fontFamily, 12, FontStyleRegular, UnitPoint);
 	SolidBrush   solidBrush(Color(255, 0, 0, 0));
-
-	
 	
 
 	SolidBrush backgroundBrush(Color(255,255,255,255));
@@ -210,7 +205,7 @@ void CQueueDrawHelper::Draw(CDC* pDC, CRect* pDrawCtrlRect)
 	BlackArrowPen.SetCustomEndCap(&myArrow);
 	
 
-	graphics.FillRectangle(&backgroundBrush, 0, 0, pDrawCtrlRect->Width(), pDrawCtrlRect->Height());
+	graphics.FillRectangle(&backgroundBrush, 0, 0, m_rcDrawingWindowPhysicalPosAndSize.Width(), m_rcDrawingWindowPhysicalPosAndSize.Height());
 	
 	
 	// dequeue zone
@@ -418,34 +413,28 @@ void CQueueDrawHelper::Draw(CDC* pDC, CRect* pDrawCtrlRect)
 			graphics.DrawLine(&BlackArrowPen, ptStartPhysical.x, ptStartPhysical.y, ptEndPhysical.x, ptEndPhysical.y);
 		}
 	}
-
-
-	
-
-	
-	
-
 }
 
-void CQueueDrawHelper::OnInit(CQueueHelper* pQH, CWnd* pWnd)
+void CQueueDrawHelper::OnInit(CQueueHelper* pQH, CVisualQueueDrawerCtrl* pWnd)
 {
 	ASSERT(pQH);
 	ASSERT(pWnd && pWnd->GetSafeHwnd());
 	
 	m_pQueueHelper = pQH;
 	m_pDrawingWindow = pWnd;
+	pWnd->m_pQueueDrawHelper = this;
+	m_pDrawingWindow->ModifyStyle(0, SS_OWNERDRAW);
 
 	m_rcDrawingWindowLogicalPosAndSize = computeCanvasRect();
-	m_pDrawingWindow->GetWindowRect(&m_rcDrawingWindowPhysicalPosAndSize);
+	m_pDrawingWindow->GetClientRect(&m_rcDrawingWindowPhysicalPosAndSize);
 	_computeUnitsConvParams();
 }
 
 void CQueueDrawHelper::OnResizeWindow()
 {
 	ASSERT(m_pDrawingWindow && m_pDrawingWindow->GetSafeHwnd());
-	m_pDrawingWindow->GetWindowRect(&m_rcDrawingWindowPhysicalPosAndSize);
+	m_pDrawingWindow->GetClientRect(&m_rcDrawingWindowPhysicalPosAndSize);
 	_computeUnitsConvParams();
-
 }
 
 CRect CQueueDrawHelper::computeCanvasRect()
@@ -538,16 +527,6 @@ void CQueueDrawHelper::_computeUnitsConvParams()
 	if (m_DrawUnitLength.cx < m_DrawUnitLength.cy) m_DrawUnitLength.cy = m_DrawUnitLength.cx;
 	if (m_DrawUnitLength.cx > m_DrawUnitLength.cy) m_DrawUnitLength.cx = m_DrawUnitLength.cy;
 
-}
-
-RECT CQueueDrawHelper::_convert(CRect* pRC)
-{
-	RECT r;
-	r.left = pRC->left;
-	r.right = pRC->right;
-	r.top = pRC->top;
-	r.bottom = pRC->bottom;
-	return r;
 }
 
 CRect CQueueDrawHelper::_logicalUnits2DeviceUnits(CRect* pRC)

@@ -44,18 +44,19 @@ private:
 };
 
 
+class CVisualQueueDrawerCtrl;
 // class pour mesurer les positons des elements
 
 class CQueueDrawHelper
 {
 public:
-	CQueueDrawHelper();		
-
+	CQueueDrawHelper();	
 	// 
-	void Draw(CDC* pDC, CRect* pDrawCtrlRect);// CDC : Device Context
+	void Draw();// CDC : Device Context
 
-	void OnInit(CQueueHelper* pQH,CWnd* pWnd);	
+	void OnInit(CQueueHelper* pQH, CVisualQueueDrawerCtrl* pWnd);
 	void OnResizeWindow();
+
 private:
 	// compute
 
@@ -103,12 +104,12 @@ private:
 	CRect ComputeQueueExtraZone();//17,18	
 
 private:
-	CQueueHelper* m_pQueueHelper;
-	
+	CQueueHelper* m_pQueueHelper;	
 	CWnd* m_pDrawingWindow;
 	
 	CRect m_rcDrawingWindowLogicalPosAndSize;
 	CRect m_rcDrawingWindowPhysicalPosAndSize;
+	CSize m_DrawUnitLength;
 	
 	int m_nMarge;	
 	int m_nTopY;
@@ -119,13 +120,11 @@ private:
 	int m_nElementWidth;
 	int m_nElementHeight;
 	int m_nElementAdrHeight;
-	
 
-	CSize m_DrawUnitLength;	
 
 private:
 	void _computeUnitsConvParams();
-	RECT _convert(CRect* pRC);
+	
 	CRect _logicalUnits2DeviceUnits(CRect* pRC);
 	CPoint _logicalUnits2DeviceUnits(CPoint* pPt);
 

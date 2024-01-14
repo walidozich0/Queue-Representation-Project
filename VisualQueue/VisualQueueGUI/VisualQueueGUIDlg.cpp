@@ -59,8 +59,6 @@ CVisualQueueGUIDlg::CVisualQueueGUIDlg(CWnd* pParent /*=nullptr*/)
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 	TRACE("\r\n****** Conctructeur CVisualQueueGUIDlg\r\n");
 
-	
-	m_wndDrawCtrl.m_pQueueDrawHelper = &m_queueDrawHelper;
 }
 
 void CVisualQueueGUIDlg::DoDataExchange(CDataExchange* pDX)
@@ -120,13 +118,10 @@ BOOL CVisualQueueGUIDlg::OnInitDialog()
 	SetIcon(m_hIcon, FALSE);		// Set small icon
 
 	// TODO: Add extra initialization here
-	((CSpinButtonCtrl*)GetDlgItem(IDC_SPIN_NBR_ELTS))->SetRange(1, 20);
-
-	
+	((CSpinButtonCtrl*)GetDlgItem(IDC_SPIN_NBR_ELTS))->SetRange(1, m_queueHelper.GetQueueMaxItemsCount());
 
 	
 	m_queueDrawHelper.OnInit(&m_queueHelper, &m_wndDrawCtrl);
-	m_wndDrawCtrl.ModifyStyle(0, SS_OWNERDRAW);
 
 	_updateQueueContent();
 	
