@@ -122,6 +122,24 @@ private:
 	int m_nElementAdrHeight;
 
 
+	FontFamily   m_fontFamily;
+	Gdiplus::Font m_font;
+	Pen m_normalPen;
+	Pen m_DataPen;
+	Pen m_dashedPen;
+	Pen m_dashedPen2;
+	Pen m_arrowPen;
+	Pen m_BlackArrowPen;
+	SolidBrush  m_solidBrush;
+	SolidBrush m_backgroundBrush;
+	SolidBrush m_backgroundBrushElt;
+	SolidBrush m_backgroundBrushAdr;
+	SolidBrush m_backgroundBrushAdrSuiv;
+	SolidBrush m_backgroundBrushData;
+	SolidBrush m_backgroundBrushEnqued;
+	SolidBrush m_backgroundBrushDequed;
+	SolidBrush m_backgroundBrushPeeked;
+
 private:
 	void _computeUnitsConvParams();
 	
