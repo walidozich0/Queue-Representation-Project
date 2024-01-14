@@ -250,7 +250,7 @@ void CVisualQueueGUIDlg::OnClickedButtonDequeue()
 	{
 		m_queueDrawHelper.EnableAnimation(m_bAnimationEnabled);		
 
-		if (m_queueDrawHelper.AnimationEnabled())
+		if (m_queueDrawHelper.AnimationEnabled()&&(m_queueHelper.GetQueueItemsCount() > 1))
 		{
 			enableQueueCtrls(FALSE);			
 			m_queueDrawHelper.StartAnimationForDequeueOperation();

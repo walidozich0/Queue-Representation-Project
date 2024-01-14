@@ -1201,17 +1201,22 @@ void CQueueDrawHelper::_DrawAnimationForEnqueueOperation(Graphics* pGraphics)
 #define  ANIM_DEQOP_EXVAR_5_PT_ELEMENTDATAPOSOUTARROWPOS		305
 #define  ANIM_DEQOP_EXVAR_6_RC_DEQDATAPOS						306
 #define  ANIM_DEQOP_EXVAR_7_PT_INTERM							307
+#define  ANIM_DEQOP_EXVAR_8_PT_DEQDATAINARROWPOS				308
 
-#define ANIM_DEQOP_ID_0_START				300
-#define ANIM_DEQOP_ID_1_DATATRASF2			301
-#define ANIM_DEQOP_ID_2_DATATRASF3			302
-#define ANIM_DEQOP_ID_3_DATATRASF4			303
+#define ANIM_DEQOP_ID_0_HEAD_SELECT			300
+#define ANIM_DEQOP_ID_1_DATATRASF1			301
+#define ANIM_DEQOP_ID_2_DATATRASF2			302
+#define ANIM_DEQOP_ID_3_DATATRASF3			303
+#define ANIM_DEQOP_ID_4_DATATRASF4			304
+#define ANIM_DEQOP_ID_5_FREEELT1			305
+#define ANIM_DEQOP_ID_5_FREEELT2			306
 
-#define ANIM_DEQOP_GRP_0_TEMPELT			300
+#define ANIM_DEQOP_GRP_0_HEAD_SELECT		300
 #define ANIM_DEQOP_GRP_1_DATATRASF1			301
 #define ANIM_DEQOP_GRP_2_DATATRASF2			302
 #define ANIM_DEQOP_GRP_3_DATATRASF3			303
-#define ANIM_DEQOP_GRP_4_FREEMEM			304
+#define ANIM_DEQOP_GRP_4_DATATRASF4			304
+#define ANIM_DEQOP_GRP_5_FREEELT			305
 
 
 #define ANIM_DEQOP_SEQ_MAIN 300
@@ -1229,14 +1234,30 @@ void CQueueDrawHelper::_BuildAnimationForDequeueOperation()
 		return;
 	}
 
-	/*ComputeDequeuedElementDataPos();
-	ComputeDequeueDataPos();*/
-	
-
-	
 	Cleanup();	
 
-	// start
+	CRect rcHeadPointerPos = _logicalUnits2DeviceUnits(&ComputeHeadPointerPos());
+	CPoint ptHeadPointerOutArrowPos = _logicalUnits2DeviceUnits(&ComputeHeadPointerOutArrowPos());
+	CPoint ptQueueElementInArrowPosFromHeader = _logicalUnits2DeviceUnits(&ComputeQueueElementInArrowPosFromHeader(0));
+	CRect rcElementDataPos = _logicalUnits2DeviceUnits(&ComputeQueueElementDataPos(0));
+	CPoint ptElementDataPosOutArrowPos(rcElementDataPos.left, rcElementDataPos.top + rcElementDataPos.Height() / 2);
+	CRect rcDequedDataPos = _logicalUnits2DeviceUnits(&ComputeDequeueDataPos());
+	CPoint ptInterm(rcDequedDataPos.left + rcDequedDataPos.Width() / 2, ptElementDataPosOutArrowPos.y);
+	CPoint ptDequedDataInArrowPos(ptInterm.x, rcDequedDataPos.bottom);
+
+
+
+	//defintion vars
+	SetRectExtraVar( ANIM_DEQOP_EXVAR_1_RC_HEADPOINTERPOS, rcHeadPointerPos);
+	SetPointExtraVar(ANIM_DEQOP_EXVAR_2_PT_HEADPOINTEROUTARROWPOS, ptHeadPointerOutArrowPos);
+	SetPointExtraVar(ANIM_DEQOP_EXVAR_3_PT_QUEUEELEMENTINARROWPOSFROMHEADER, ptQueueElementInArrowPosFromHeader);
+	SetRectExtraVar( ANIM_DEQOP_EXVAR_4_RC_ELEMENTDATAPOS, rcElementDataPos);
+	SetPointExtraVar(ANIM_DEQOP_EXVAR_5_PT_ELEMENTDATAPOSOUTARROWPOS, ptElementDataPosOutArrowPos);
+	SetRectExtraVar( ANIM_DEQOP_EXVAR_6_RC_DEQDATAPOS, rcDequedDataPos);
+	SetPointExtraVar(ANIM_DEQOP_EXVAR_7_PT_INTERM, ptInterm);
+	SetPointExtraVar(ANIM_DEQOP_EXVAR_8_PT_DEQDATAINARROWPOS, ptDequedDataInArrowPos);
+
+	/*// start
 	{
 		CAnimationValue* pAnimObj = DefineAnimationValue(ANIM_DEQOP_ID_0_START, ANIM_DEQOP_GRP_0_TEMPELT);
 		pAnimObj->AddTransition(new CInstantaneousTransition(1));//val
@@ -1246,33 +1267,162 @@ void CQueueDrawHelper::_BuildAnimationForDequeueOperation()
 		CAnimationValue* pAnimObj = DefineAnimationValue(ANIM_DEQOP_ID_1_DATATRASF2, ANIM_DEQOP_GRP_1_DATATRASF1,0,1,2);
 					
 	}
+	*/
+
+	// head
+	{
+		CPoint animPoints[7] = {
+			CPoint(ptHeadPointerOutArrowPos.x - 1 ,ptHeadPointerOutArrowPos.y),//astuce pour la courbe !!!
+			CPoint(rcHeadPointerPos.left,rcHeadPointerPos.bottom),
+			rcHeadPointerPos.TopLeft(),
+			CPoint(rcHeadPointerPos.right,rcHeadPointerPos.top),
+			rcHeadPointerPos.BottomRight(),
+			ptHeadPointerOutArrowPos,
+			ptQueueElementInArrowPosFromHeader
+		};
+		VERIFY(DefineAnimationPoint(ANIM_DEQOP_ID_0_HEAD_SELECT, ANIM_DEQOP_GRP_0_HEAD_SELECT, animPoints, 7, 0.5));
+	}
+	
 
 	// transf 2 arrow transf
 	{
+		DefineAnimationValue(ANIM_DEQOP_ID_1_DATATRASF1, ANIM_DEQOP_GRP_1_DATATRASF1, 0, 359, 2);
 
+	}
+
+	// arrow transf
+	{
+		CPoint animPoints[3] = { ptElementDataPosOutArrowPos, ptInterm, ptDequedDataInArrowPos };
+		VERIFY(DefineAnimationPoint(ANIM_DEQOP_ID_2_DATATRASF2, ANIM_DEQOP_GRP_2_DATATRASF2, animPoints, 3, 1.0));
 	}
 
 	// transf 3 set valuue
 	{
+		DefineAnimationValue(ANIM_DEQOP_ID_3_DATATRASF3, ANIM_DEQOP_GRP_3_DATATRASF3, 0, 359, 2);
+	}
+
+	// dispaly value
+	{
+		CAnimationValue* pValue = DefineAnimationValue(ANIM_DEQOP_ID_4_DATATRASF4, ANIM_DEQOP_GRP_4_DATATRASF4);
+		ASSERT(pValue);
+		(*pValue) = 0;
+		pValue->AddTransition(new CInstantaneousTransition(1));//val
+
 
 	}
 	
 	// liberation elts
 	{
+		//ANIM_DEQOP_GRP_5_FREEELT
+		//ANIM_DEQOP_ID_5_FREEELT
+		CAnimationValue* pValue = DefineAnimationValue(ANIM_DEQOP_ID_5_FREEELT1, ANIM_DEQOP_GRP_5_FREEELT);
+		ASSERT(pValue);
+		(*pValue) = 0;
+		pValue->AddTransition(new CInstantaneousTransition(1));//val
+		CRect rc = _logicalUnits2DeviceUnits(&ComputeHeadElementPos());
+		DefineAnimationPoint(ANIM_DEQOP_ID_5_FREEELT2, ANIM_DEQOP_GRP_5_FREEELT,rc.BottomRight(), rc.TopLeft(), 2);
 
 	}
 
-	DefineSequence(ANIM_DEQOP_SEQ_MAIN, ANIM_DEQOP_GRP_0_TEMPELT, ANIM_DEQOP_GRP_1_DATATRASF1);
+
+	DefineSequence(ANIM_DEQOP_SEQ_MAIN, ANIM_DEQOP_GRP_0_HEAD_SELECT, ANIM_DEQOP_GRP_5_FREEELT);
 
 
 	
 }
-
 void CQueueDrawHelper::_DrawAnimationForDequeueOperation(Graphics* pGraphics)
 {
 	if (m_AnimMode != AnimMode::amDequeueOperation) return;
 	ASSERT(m_pDrawingWindow && m_pDrawingWindow->GetSafeHwnd());	
 
+	CAnimationValue* pAnimValueEltFree = (CAnimationValue*)GetAnimationObjectById(ANIM_DEQOP_ID_5_FREEELT1);
+	ASSERT(pAnimValueEltFree);
+	BOOL bEltFree = (((int)(*pAnimValueEltFree)) == 1);
+
+	//head
+	if (!bEltFree)
+	{
+		CRect* pHeadPointerPosRect = GetRectExtraVar(ANIM_DEQOP_EXVAR_1_RC_HEADPOINTERPOS);
+		CPoint* pHeadPointerOutArrowPosPt = GetPointExtraVar(ANIM_DEQOP_EXVAR_2_PT_HEADPOINTEROUTARROWPOS);
+		CPoint* pQueueElementInArrowPosFromHeaderPt = GetPointExtraVar(ANIM_DEQOP_EXVAR_3_PT_QUEUEELEMENTINARROWPOSFROMHEADER);
+
+		ASSERT(pHeadPointerPosRect && pHeadPointerOutArrowPosPt && pQueueElementInArrowPosFromHeaderPt);
+
+		CPoint refPoints[7] = {
+			CPoint(pHeadPointerOutArrowPosPt->x - 1 ,pHeadPointerOutArrowPosPt->y),//astuce pour la courbe !!!
+			CPoint(pHeadPointerPosRect->left,pHeadPointerPosRect->bottom),
+			pHeadPointerPosRect->TopLeft(),
+			CPoint(pHeadPointerPosRect->right,pHeadPointerPosRect->top),
+			pHeadPointerPosRect->BottomRight(),
+			*pHeadPointerOutArrowPosPt,
+			*pQueueElementInArrowPosFromHeaderPt
+		};
+
+		/*Point ptsToDraw1[7];
+		_helperCopyPoints(refPoints, ptsToDraw1, 7);
+		pGraphics->DrawLines(&m_dashedPen, ptsToDraw1, 7);*/
+
+		CAnimationPoint* pAnimPoint = (CAnimationPoint*)GetAnimationObjectById(ANIM_DEQOP_ID_0_HEAD_SELECT);
+		ASSERT(pAnimPoint);
+		CPoint ptMoving = *pAnimPoint;
+		_helperDrawConstrainedLine(refPoints, 7, ptMoving, pGraphics, &m_AnimGeneralPen, FALSE);
+	}
+
+	
+	if (!bEltFree)
+	{
+		CAnimationValue* pAnimValue = (CAnimationValue*)GetAnimationObjectById(ANIM_DEQOP_ID_1_DATATRASF1);
+		ASSERT(pAnimValue);
+		CRect* pRect = GetRectExtraVar(ANIM_DEQOP_EXVAR_4_RC_ELEMENTDATAPOS);
+		ASSERT(pRect);
+
+		int nSweepAngle = (*pAnimValue);
+		if (nSweepAngle >= 360) nSweepAngle = nSweepAngle % 360;		
+		pGraphics->DrawArc(&m_AnimDataAskingPen, pRect->left, pRect->top, pRect->Width(), pRect->Height(), 180, nSweepAngle);
+	}
+
+	if (!bEltFree)
+	{
+		CPoint* pElementDataPosOutArrowPosPt = GetPointExtraVar(ANIM_DEQOP_EXVAR_5_PT_ELEMENTDATAPOSOUTARROWPOS);
+		CPoint* pIntermPt = GetPointExtraVar(ANIM_DEQOP_EXVAR_7_PT_INTERM);
+		CPoint* pDeqDataInArrowPosPt = GetPointExtraVar(ANIM_DEQOP_EXVAR_8_PT_DEQDATAINARROWPOS);
+		ASSERT(pElementDataPosOutArrowPosPt && pIntermPt && pDeqDataInArrowPosPt);
+		CPoint refPoints[3] = { *pElementDataPosOutArrowPosPt, *pIntermPt, *pDeqDataInArrowPosPt };
+
+
+
+		CAnimationPoint* pAnimPoint = (CAnimationPoint*)GetAnimationObjectById(ANIM_DEQOP_ID_2_DATATRASF2);
+		ASSERT(pAnimPoint);
+		CPoint ptMoving = *pAnimPoint;
+		_helperDrawConstrainedLine(refPoints, 3, ptMoving, pGraphics, &m_AnimArrowPen, FALSE);
+	}
+
+	if (!bEltFree)
+	{
+		CAnimationValue* pAnimValue = (CAnimationValue*)GetAnimationObjectById(ANIM_DEQOP_ID_3_DATATRASF3);
+		ASSERT(pAnimValue);
+		CRect* pRect = GetRectExtraVar(ANIM_DEQOP_EXVAR_6_RC_DEQDATAPOS);
+		ASSERT(pRect);
+
+		int nSweepAngle = (*pAnimValue);
+		if (nSweepAngle >= 360) nSweepAngle = nSweepAngle % 360;
+		pGraphics->DrawArc(&m_AnimDataAskingPen, pRect->left, pRect->top, pRect->Width(), pRect->Height(), 90, nSweepAngle);
+	}
+
+	{
+		CAnimationValue* pAnimValue = (CAnimationValue*)GetAnimationObjectById(ANIM_DEQOP_ID_5_FREEELT1);
+		ASSERT(pAnimValue);
+		if (((int)(*pAnimValue)) == 1)
+		{
+			CAnimationPoint* pAnimPoint = (CAnimationPoint*)GetAnimationObjectById(ANIM_DEQOP_ID_5_FREEELT2);
+			ASSERT(pAnimPoint);
+			CPoint ptMoving = *pAnimPoint;
+			CRect rc = _logicalUnits2DeviceUnits(&ComputeHeadElementPos());
+
+			pGraphics->FillRectangle(&m_backgroundBrushElt, RectF(rc.left, rc.top, ptMoving.x - (rc.left), ptMoving.y - (rc.top)));
+			pGraphics->DrawRectangle(&m_normalPen, RectF(rc.left, rc.top, ptMoving.x - (rc.left), ptMoving.y - (rc.top)));
+		}		
+	}
 
 }
 
@@ -1336,8 +1486,29 @@ void CQueueDrawHelper::Draw()
 	{
 
 		CString strDequedValue;
-		if (m_pQueueHelper->GetLastDequeuedValue() != -1)
-			strDequedValue.Format(_T("%02d"), m_pQueueHelper->GetLastDequeuedValue());
+		
+		
+		if (m_AnimMode == AnimMode::amDequeueOperation)
+		{
+			//ANIM_DEQOP_ID_4_DATATRASF4
+			CAnimationValue* pAnimVal = (CAnimationValue* )GetAnimationObjectById(ANIM_DEQOP_ID_4_DATATRASF4);
+			if ((int)(*pAnimVal) == 1)
+			{
+				strDequedValue.Format(_T("%02d"), m_pQueueHelper->GetLastDequeuedValue());
+			}
+			else
+			{
+				strDequedValue = _T("??");
+			}
+
+		}
+		else
+		{
+			if (m_pQueueHelper->GetLastDequeuedValue() != -1) strDequedValue.Format(_T("%02d"), m_pQueueHelper->GetLastDequeuedValue());
+		}
+		
+
+
 		CRect rcLogical = ComputeDequeueDataPos();
 		CRect rcPhysical = _logicalUnits2DeviceUnits(&rcLogical);
 		graphics.FillEllipse(&m_backgroundBrushDequed, rcPhysical.left, rcPhysical.top, rcPhysical.Width(), rcPhysical.Height());
@@ -1465,8 +1636,16 @@ void CQueueDrawHelper::Draw()
 	}
 
 	
+	CAnimationValue* pAnimValueEltFree = NULL;
+	if (m_AnimMode == AnimMode::amDequeueOperation)
+	{
+		pAnimValueEltFree = (CAnimationValue*)GetAnimationObjectById(ANIM_DEQOP_ID_5_FREEELT1);
+		ASSERT(pAnimValueEltFree);
+	}
+	
+ 
 
-	if(m_AnimMode == AnimMode::amDequeueOperation)
+	if((m_AnimMode == AnimMode::amDequeueOperation)&& (pAnimValueEltFree && (((int)(*pAnimValueEltFree)) != 1)))
 	{
 		CString strCurrentData = m_pQueueHelper->GetLastDequeuedData();
 		ASSERT(strCurrentData.GetLength() == 10);
@@ -1795,7 +1974,6 @@ void CQueueDrawHelper::StartAnimationForEnqueueOperation()
 	m_AnimMode = AnimMode::amEnqueueOperation;
 	AnimateSequence(ANIM_ENQOP_SEQ_MAIN);
 }
-
 void CQueueDrawHelper::StartAnimationForDequeueOperation()
 {
 	if (!m_bAnimationEnabled) return;
