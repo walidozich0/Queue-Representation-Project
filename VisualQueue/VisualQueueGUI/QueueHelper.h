@@ -61,7 +61,7 @@ void _helperCopyRects(CRect* pSrcRects, Rect* pDestRects, int nCount);
 void _helperDrawPoint(CPoint pt, int nWidth, Graphics* pGraphics, CBrush* pBrush);
 
 
-class CQueueDrawHelper : CAnimationControllerEx
+class CQueueDrawHelper : public CAnimationControllerEx
 {
 public:
 	CQueueDrawHelper();	

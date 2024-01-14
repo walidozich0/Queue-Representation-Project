@@ -55,6 +55,7 @@ CVisualQueueGUIDlg::CVisualQueueGUIDlg(CWnd* pParent /*=nullptr*/)
 	: CDialogEx(IDD_VISUALQUEUEGUI_DIALOG, pParent)
 	, m_NbrEltsGenerate(10)
 	, m_nEnqueueValue(0)
+	, m_bAnimationEnabled(FALSE)
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 	TRACE("\r\n****** Conctructeur CVisualQueueGUIDlg\r\n");
@@ -69,6 +70,7 @@ void CVisualQueueGUIDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Text(pDX, IDC_EDIT_ENQUEUE_VAL, m_nEnqueueValue);
 	DDV_MinMaxInt(pDX, m_nEnqueueValue, 0, 99);
 	DDX_Control(pDX, IDC_DRAW_ZONE, m_wndDrawCtrl);
+	DDX_Check(pDX, IDC_CHK_ANIMATIONS_ENABLED, m_bAnimationEnabled);
 }
 
 BEGIN_MESSAGE_MAP(CVisualQueueGUIDlg, CDialogEx)
@@ -80,6 +82,7 @@ BEGIN_MESSAGE_MAP(CVisualQueueGUIDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_BUTTON_DEQUEUE, &CVisualQueueGUIDlg::OnClickedButtonDequeue)
 	ON_BN_CLICKED(IDC_BUTTON_GENERATE, &CVisualQueueGUIDlg::OnClickedButtonGenerate)
 	ON_BN_CLICKED(IDC_BUTTON_PEEK, &CVisualQueueGUIDlg::OnClickedButtonPeek)
+	ON_BN_CLICKED(IDC_BTN_PAUSE_RESUME, &CVisualQueueGUIDlg::OnBnClickedBtnPauseResume)
 END_MESSAGE_MAP()
 
 
@@ -256,6 +259,7 @@ void CVisualQueueGUIDlg::OnClickedButtonGenerate()
 
 void CVisualQueueGUIDlg::OnClickedButtonPeek()
 {
+	UpdateData(TRUE);
 	int nPeekedValue = m_queueHelper.Peek();
 	_updateQueueContent();
 	m_wndDrawCtrl.Invalidate();
@@ -270,8 +274,9 @@ void CVisualQueueGUIDlg::OnClickedButtonPeek()
 
 	SetDlgItemText(IDC_BUTTON_PEEK, strTemp);
 
-	if (m_queueDrawHelper.AnimationEnabled())
-		m_queueDrawHelper.StartAnimationForPeekOperation();	
+	m_queueDrawHelper.EnableAnimation(m_bAnimationEnabled);
+
+	if (m_queueDrawHelper.AnimationEnabled()) m_queueDrawHelper.StartAnimationForPeekOperation();	
 
 }
 
@@ -291,4 +296,11 @@ void CVisualQueueGUIDlg::_updateQueueContent()
 
 	SetDlgItemText(IDC_LBL_QUEUE, strQueue);
 
+}
+
+
+void CVisualQueueGUIDlg::OnBnClickedBtnPauseResume()
+{
+	if(m_queueDrawHelper.IsAnimationInProgress()) m_queueDrawHelper.PauseAllAnimations();
+	else m_queueDrawHelper.ResumeAllAnimations();
 }

@@ -44,10 +44,6 @@ public:
 	CAnimationValue* DefineAnimationValue(WORD wAnimObjId, UINT nGroupId);
 	CAnimationValue* DefineAnimationValue(WORD wAnimObjId, UINT nGroupId, int nStart, int nEnd, UI_ANIMATION_SECONDS nDuration);
 
-
-
-
-
 	CAnimationBaseObject* GetAnimationObjectById(WORD wObjectId);
 
 	// Animation Sequence

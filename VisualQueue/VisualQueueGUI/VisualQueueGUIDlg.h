@@ -54,4 +54,6 @@ private:
 	
 public:
 	CVisualQueueDrawerCtrl m_wndDrawCtrl;
+	afx_msg void OnBnClickedBtnPauseResume();
+	BOOL m_bAnimationEnabled;
 };

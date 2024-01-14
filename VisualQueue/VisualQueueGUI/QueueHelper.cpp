@@ -2,9 +2,6 @@
 #include "QueueHelper.h"
 #include "VisualQueueDrawerCtrl.h"
 
-
-
-
 CQueueHelper::CQueueHelper():
 	m_pQueue(NULL)
 	, m_strTextRepresentation(_T("(File Non Initialisée)"))
@@ -16,7 +13,6 @@ CQueueHelper::CQueueHelper():
 	TRACE("\r\n******* Constructeur CQueueHelper appelé\r\n");
 	
 }
-
 CQueueHelper::~CQueueHelper()
 {
 	TRACE("\r\n******* Destructeur CQueueHelper appelé\r\n");
@@ -28,7 +24,6 @@ BOOL CQueueHelper::IsQueueInitialized()
 {
 	return m_pQueue!=NULL;
 }
-
 void CQueueHelper::InitQueue(int nItemsCount)
 {
 	FreeQueue();
@@ -41,7 +36,6 @@ void CQueueHelper::InitQueue(int nItemsCount)
 	}
 
 }
-
 void CQueueHelper::Enqueue(int nValue)
 {
 	_initFileIfNot();
@@ -56,26 +50,22 @@ void CQueueHelper::Enqueue(int nValue)
 	m_nLastEnqueuedValue = nValue;
 	_generateTextData();// regenerer la represenattion textuelle
 }
-
 int CQueueHelper::Peek()
 {
 	if (!IsQueueInitialized()) return -1;
 	m_nLastPeekedValue = ::peek(m_pQueue);
 }
-
 int CQueueHelper::Dequeue()
 {
 	if (!IsQueueInitialized()) return -1;
 	m_nLastDequeuedValue = ::Dequeue(m_pQueue);
 	_generateTextData();// regenerer la represenattion textuelle
 }
-
 int CQueueHelper::GetQueueItemsCount()
 {
 	if (!IsQueueInitialized()) return 0;
 	return m_pQueue->m_nItemsCount;
 }
-
 void CQueueHelper::FreeQueue()
 {
 	if (m_pQueue)
@@ -87,7 +77,6 @@ void CQueueHelper::FreeQueue()
 	m_strTextRepresentation = _T("(File Non Initialisée)");
 	m_nLastEnqueuedValue = m_nLastDequeuedValue = m_nLastPeekedValue = -1;
 }
-
 void CQueueHelper::_initFileIfNot()
 {
 	if (!m_pQueue)
@@ -97,7 +86,6 @@ void CQueueHelper::_initFileIfNot()
 		m_nLastEnqueuedValue = m_nLastDequeuedValue = m_nLastPeekedValue = -1;
 	}
 }
-
 void CQueueHelper::_generateTextData()
 {
 	if (!IsQueueInitialized())
@@ -134,7 +122,6 @@ void CQueueHelper::_generateTextData()
 	}
 }
 
-
 //////////////////////////////////////////
 
 int _helperMinPointIndexInPtsSegment(CPoint& pt, CPoint& pt1, CPoint& pt2)//-1,0,1
@@ -150,7 +137,6 @@ int _helperMinPointIndexInPtsSegment(CPoint& pt, CPoint& pt1, CPoint& pt2)//-1,0
 	ASSERT(FALSE);
 	return -1;
 }
-
 int _helperMinPointIndexInPtsArray(CPoint* pPoints, int nCount, CPoint& point)
 {
 	ASSERT(nCount > 1);
@@ -165,7 +151,6 @@ int _helperMinPointIndexInPtsArray(CPoint* pPoints, int nCount, CPoint& point)
 	}
 	return -1;
 }
-
 void _helperDrawConstrainedLine(CPoint* pPoints, int nCount, CPoint& point, Graphics* pGraphics, Pen* pPen, BOOL bDrawCurve)
 {
 	if (point == pPoints[0])
@@ -218,17 +203,14 @@ void _helperDrawConstrainedLine(CPoint* pPoints, int nCount, CPoint& point, Grap
 	if (pPointsToDraw) delete[] pPointsToDraw;
 
 }
-
 Point _helperConvertStruct(CPoint& pt)
 {
 	return Point(pt.x, pt.y);
 }
-
 Rect _helperConvertStruct(CRect& rc)
 {
 	return Rect(rc.left, rc.top, rc.Width(), rc.Height());
 }
-
 void _helperCopyPoints(CPoint* pSrcPoints, Point* pDestPoints, int nCount)
 {
 	if (pSrcPoints && pDestPoints && (nCount > 0))
@@ -236,7 +218,6 @@ void _helperCopyPoints(CPoint* pSrcPoints, Point* pDestPoints, int nCount)
 		for (int i = 0; i < nCount; i++) { pDestPoints[i] = _helperConvertStruct(pSrcPoints[i]); }
 	}
 }
-
 void _helperCopyRects(CRect* pSrcRects, Rect* pDestRects, int nCount)
 {
 	if (pSrcRects && pDestRects && (nCount > 0))
@@ -244,8 +225,6 @@ void _helperCopyRects(CRect* pSrcRects, Rect* pDestRects, int nCount)
 		for (int i = 0; i < nCount; i++) { pDestRects[i] = _helperConvertStruct(pSrcRects[i]); }
 	}
 }
-
-
 void _helperDrawCircularPoint(CPoint pt, int nWidth,Graphics* pGraphics, Brush* pBrush)
 {
 	RectF r(pt.x - nWidth,pt.y - nWidth, 2 * nWidth, 2 * nWidth);
@@ -255,6 +234,28 @@ void _helperDrawCircularPoint(CPoint pt, int nWidth,Graphics* pGraphics, Brush* 
 ///////////////////////////////////////
 // CQueueDrawSettings
 
+void _helperDrawTextCentered(Graphics* pGraphics,const WCHAR* string, INT length,CRect& rcText, Gdiplus::Font* pFont, Brush* pBrush)
+{
+	//pGraphics->MeasureString(strText, strText.GetLength(), pFont);
+
+	RectF layoutRect;
+	RectF boundingBox;
+	PointF pf(0, 0);
+
+		pGraphics->MeasureString(
+			string,
+			length,
+			pFont,
+			layoutRect,
+			& boundingBox);
+		
+	
+	GraphicsState st = pGraphics->Save();
+	pGraphics->TranslateTransform(rcText.left, rcText.top);
+	pGraphics->ScaleTransform(rcText.Width() / boundingBox.Width, rcText.Height() / boundingBox.Height);
+	pGraphics->DrawString(string, length, pFont, pf, NULL, pBrush);
+	pGraphics->Restore(st);
+}
 
 
 CQueueDrawHelper::CQueueDrawHelper():
@@ -279,9 +280,9 @@ CQueueDrawHelper::CQueueDrawHelper():
 
 	, m_bAnimationEnabled(TRUE)
 	, m_AnimMode(AnimMode::amNone)
-	, m_AnimGeneralPen(Color(255, 255, 0, 0), 2.0F)
-	, m_AnimDataAskingPen(Color(255, 255, 0, 0), 2.0F)
-	, m_AnimArrowPen(Color(255, 255, 0, 0), 2.0F)
+	, m_AnimGeneralPen(Color(255, 255, 0, 0), 3.0F)
+	, m_AnimDataAskingPen(Color(255, 255, 0, 0), 3.0F)
+	, m_AnimArrowPen(Color(255, 128, 0, 0), 3.0F)
 	, m_AnimMovingObjectBrush(Color(255, 255, 0, 0))
 	
 {
@@ -318,7 +319,6 @@ CQueueDrawHelper::CQueueDrawHelper():
 
 	}
 }
-
 CQueueDrawHelper::~CQueueDrawHelper()
 {
 }
@@ -330,7 +330,10 @@ void CQueueDrawHelper::Draw()
 	CMemDC memDC((*m_pDrawingWindow->GetDC()), m_rcDrawingWindowPhysicalPosAndSize);
 	Graphics graphics(memDC.GetDC());
 	graphics.SetSmoothingMode(SmoothingModeAntiAlias);
+	graphics.SetTextRenderingHint(TextRenderingHintAntiAlias);
 
+
+	
 	graphics.FillRectangle(&m_backgroundBrush, 0, 0, m_rcDrawingWindowPhysicalPosAndSize.Width(), m_rcDrawingWindowPhysicalPosAndSize.Height());
 
 	// dequeue zone
@@ -342,8 +345,9 @@ void CQueueDrawHelper::Draw()
 		CRect rcPhysical = _logicalUnits2DeviceUnits(&rcLogical);
 		graphics.FillEllipse(&m_backgroundBrushDequed, rcPhysical.left, rcPhysical.top, rcPhysical.Width(), rcPhysical.Height());
 		graphics.DrawEllipse(&m_DataPen, rcPhysical.left, rcPhysical.top, rcPhysical.Width(), rcPhysical.Height());
-		graphics.DrawString(strDequedValue, -1, &m_font,
-			RectF(rcPhysical.left, rcPhysical.top, rcPhysical.Width(), rcPhysical.Height()), NULL, &m_solidBrush);
+		/*graphics.DrawString(strDequedValue, -1, &m_font,
+			RectF(rcPhysical.left, rcPhysical.top, rcPhysical.Width(), rcPhysical.Height()), NULL, &m_solidBrush);*/
+		_helperDrawTextCentered(&graphics, strDequedValue, strDequedValue.GetLength(), rcPhysical, &m_font, &m_solidBrush);
 	}
 
 	{
@@ -389,8 +393,9 @@ void CQueueDrawHelper::Draw()
 		CRect rcPhysical = _logicalUnits2DeviceUnits(&rcLogical);
 		graphics.FillEllipse(&m_backgroundBrushPeeked, rcPhysical.left, rcPhysical.top, rcPhysical.Width(), rcPhysical.Height());
 		graphics.DrawEllipse(&m_DataPen, rcPhysical.left, rcPhysical.top, rcPhysical.Width(), rcPhysical.Height());
-		graphics.DrawString(strPeekedValue, -1, &m_font,
-			RectF(rcPhysical.left, rcPhysical.top, rcPhysical.Width(), rcPhysical.Height()), NULL, &m_solidBrush);
+		/*graphics.DrawString(strPeekedValue, -1, &m_font,
+			RectF(rcPhysical.left, rcPhysical.top, rcPhysical.Width(), rcPhysical.Height()), NULL, &m_solidBrush);*/
+		_helperDrawTextCentered(&graphics, strPeekedValue, strPeekedValue.GetLength(), rcPhysical, &m_font, &m_solidBrush);
 	}
 
 
@@ -401,8 +406,9 @@ void CQueueDrawHelper::Draw()
 		CRect rcPhysical = _logicalUnits2DeviceUnits(&rcLogical);
 		graphics.FillEllipse(&m_backgroundBrushData, rcPhysical.left, rcPhysical.top, rcPhysical.Width(), rcPhysical.Height());
 		graphics.DrawEllipse(&m_DataPen, rcPhysical.left, rcPhysical.top, rcPhysical.Width(), rcPhysical.Height());
-		graphics.DrawString(strEnquedValue, -1, &m_font,
-			RectF(rcPhysical.left, rcPhysical.top, rcPhysical.Width(), rcPhysical.Height()), NULL, &m_solidBrush);
+		/*graphics.DrawString(strEnquedValue, -1, &m_font,
+			RectF(rcPhysical.left, rcPhysical.top, rcPhysical.Width(), rcPhysical.Height()), NULL, &m_solidBrush);*/
+		_helperDrawTextCentered(&graphics, strEnquedValue, strEnquedValue.GetLength(), rcPhysical, &m_font, &m_solidBrush);
 	}
 
 	// queue zone
@@ -423,17 +429,18 @@ void CQueueDrawHelper::Draw()
 			CRect rcPhysical = _logicalUnits2DeviceUnits(&rcLogical);
 			graphics.FillRectangle(&m_backgroundBrushAdr, rcPhysical.left, rcPhysical.top, rcPhysical.Width(), rcPhysical.Height());
 			graphics.DrawRectangle(&m_normalPen, rcPhysical.left, rcPhysical.top, rcPhysical.Width(), rcPhysical.Height());
-			graphics.DrawString(strCurrentData.Left(4), -1, &m_font,
-				RectF(rcPhysical.left, rcPhysical.top, rcPhysical.Width(), rcPhysical.Height()), NULL, &m_solidBrush);
-
+			/*graphics.DrawString(strCurrentData.Left(4), -1, &m_font,
+				RectF(rcPhysical.left, rcPhysical.top, rcPhysical.Width(), rcPhysical.Height()), NULL, &m_solidBrush);*/
+			_helperDrawTextCentered(&graphics, strCurrentData.Left(4), -1, rcPhysical, &m_font, &m_solidBrush);
 		}
 		{
 			CRect rcLogical = ComputeQueueElementDataPos(i);
 			CRect rcPhysical = _logicalUnits2DeviceUnits(&rcLogical);
 			graphics.FillEllipse(&m_backgroundBrushData, rcPhysical.left, rcPhysical.top, rcPhysical.Width(), rcPhysical.Height());
 			graphics.DrawEllipse(&m_DataPen, rcPhysical.left, rcPhysical.top, rcPhysical.Width(), rcPhysical.Height());
-			graphics.DrawString(strCurrentData.Mid(4, 2), -1, &m_font,
-				RectF(rcPhysical.left, rcPhysical.top, rcPhysical.Width(), rcPhysical.Height()), NULL, &m_solidBrush);
+			/*graphics.DrawString(strCurrentData.Mid(4, 2), -1, &m_font,
+				RectF(rcPhysical.left, rcPhysical.top, rcPhysical.Width(), rcPhysical.Height()), NULL, &m_solidBrush);*/
+			_helperDrawTextCentered(&graphics, strCurrentData.Mid(4, 2), -1, rcPhysical, &m_font, &m_solidBrush);
 
 
 
@@ -452,8 +459,9 @@ void CQueueDrawHelper::Draw()
 			else {
 				graphics.FillRectangle(&m_backgroundBrushAdrSuiv, rcPhysical.left, rcPhysical.top, rcPhysical.Width(), rcPhysical.Height());
 				graphics.DrawRectangle(&m_normalPen, rcPhysical.left, rcPhysical.top, rcPhysical.Width(), rcPhysical.Height());
-				graphics.DrawString(strCurrentData.Right(4), -1, &m_font,
-					RectF(rcPhysical.left, rcPhysical.top, rcPhysical.Width(), rcPhysical.Height()), NULL, &m_solidBrush);
+				/*graphics.DrawString(strCurrentData.Right(4), -1, &m_font,
+					RectF(rcPhysical.left, rcPhysical.top, rcPhysical.Width(), rcPhysical.Height()), NULL, &m_solidBrush);*/
+				_helperDrawTextCentered(&graphics, strCurrentData.Right(4), -1, rcPhysical, &m_font, &m_solidBrush);
 			}
 
 
@@ -501,8 +509,9 @@ void CQueueDrawHelper::Draw()
 		CRect rcPhysical = _logicalUnits2DeviceUnits(&rcLogical);
 		graphics.FillRectangle(&m_backgroundBrushAdr, rcPhysical.left, rcPhysical.top, rcPhysical.Width(), rcPhysical.Height());
 		graphics.DrawRectangle(&m_normalPen, rcPhysical.left, rcPhysical.top, rcPhysical.Width(), rcPhysical.Height());
-		graphics.DrawString(_T("Head"), -1, &m_font,
-			RectF(rcPhysical.left, rcPhysical.top, rcPhysical.Width(), rcPhysical.Height()), NULL, &m_solidBrush);
+		/*graphics.DrawString(_T("Head"), -1, &m_font,
+			RectF(rcPhysical.left, rcPhysical.top, rcPhysical.Width(), rcPhysical.Height()), NULL, &m_solidBrush);*/
+		_helperDrawTextCentered(&graphics, _T("Head"), -1, rcPhysical, &m_font, &m_solidBrush);
 	}
 
 	{
@@ -524,8 +533,9 @@ void CQueueDrawHelper::Draw()
 		CRect rcPhysical = _logicalUnits2DeviceUnits(&rcLogical);
 		graphics.FillRectangle(&m_backgroundBrushAdr, rcPhysical.left, rcPhysical.top, rcPhysical.Width(), rcPhysical.Height());
 		graphics.DrawRectangle(&m_normalPen, rcPhysical.left, rcPhysical.top, rcPhysical.Width(), rcPhysical.Height());
-		graphics.DrawString(_T("Tail"), -1, &m_font,
-			RectF(rcPhysical.left, rcPhysical.top, rcPhysical.Width(), rcPhysical.Height()), NULL, &m_solidBrush);
+		/*graphics.DrawString(_T("Tail"), -1, &m_font,
+			RectF(rcPhysical.left, rcPhysical.top, rcPhysical.Width(), rcPhysical.Height()), NULL, &m_solidBrush);*/
+		_helperDrawTextCentered(&graphics, _T("Tail"), -1, rcPhysical, &m_font, &m_solidBrush);
 	}
 
 	{
