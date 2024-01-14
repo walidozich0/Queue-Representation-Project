@@ -25,12 +25,12 @@ public:
 	void FreeQueue();
 
 
-private:
+private: 
 	void _initFileIfNot();
 
 private:
 
-	File* m_pFile;
+	Queue* m_pQueue;
 	
 	CString m_strTextRepresentation;
 	

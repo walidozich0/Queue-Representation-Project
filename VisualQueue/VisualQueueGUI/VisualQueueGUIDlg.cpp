@@ -66,7 +66,7 @@ void CVisualQueueGUIDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
 	DDX_Text(pDX, IDC_EDIT_RAND_NBR_ELTS, m_NbrEltsGenerate);
-	DDV_MinMaxInt(pDX, m_NbrEltsGenerate, 1, 10);
+	DDV_MinMaxInt(pDX, m_NbrEltsGenerate, 1, 20);
 	DDX_Text(pDX, IDC_EDIT_ENQUEUE_VAL, m_nEnqueueValue);
 	DDV_MinMaxInt(pDX, m_nEnqueueValue, 0, 99);
 }
@@ -118,6 +118,8 @@ BOOL CVisualQueueGUIDlg::OnInitDialog()
 	SetIcon(m_hIcon, FALSE);		// Set small icon
 
 	// TODO: Add extra initialization here
+	((CSpinButtonCtrl*)GetDlgItem(IDC_SPIN_NBR_ELTS))->SetRange(1, 20);
+
 	_updateQueueContent();
 	
 	
@@ -125,6 +127,8 @@ BOOL CVisualQueueGUIDlg::OnInitDialog()
 
 	return TRUE;  // return TRUE  unless you set the focus to a control
 }
+
+
 
 void CVisualQueueGUIDlg::OnSysCommand(UINT nID, LPARAM lParam)
 {
@@ -138,11 +142,9 @@ void CVisualQueueGUIDlg::OnSysCommand(UINT nID, LPARAM lParam)
 		CDialogEx::OnSysCommand(nID, lParam);
 	}
 }
-
 // If you add a minimize button to your dialog, you will need the code below
 //  to draw the icon.  For MFC applications using the document/view model,
 //  this is automatically done for you by the framework.
-
 void CVisualQueueGUIDlg::OnPaint()
 {
 	if (IsIconic())
@@ -167,7 +169,6 @@ void CVisualQueueGUIDlg::OnPaint()
 		CDialogEx::OnPaint();
 	}
 }
-
 // The system calls this function to obtain the cursor to display while the user drags
 //  the minimized window.
 HCURSOR CVisualQueueGUIDlg::OnQueryDragIcon()
@@ -175,6 +176,24 @@ HCURSOR CVisualQueueGUIDlg::OnQueryDragIcon()
 	return static_cast<HCURSOR>(m_hIcon);
 }
 
+
+void CVisualQueueGUIDlg::OnOK()
+{
+	int nFocusCtrlId = GetFocus()->GetDlgCtrlID();
+	switch (nFocusCtrlId)
+	{
+	case IDC_EDIT_ENQUEUE_VAL: OnClickedButtonEnqueue(); return;
+	case IDC_EDIT_RAND_NBR_ELTS: OnClickedButtonGenerate(); return;
+	default:
+		break;
+	}
+
+}
+void CVisualQueueGUIDlg::OnCancel()
+{
+	if (AfxMessageBox(_T("Voulez vous quitter l'app"), MB_YESNO | MB_ICONQUESTION) == IDYES)
+		CDialogEx::OnCancel();
+}
 
 
 void CVisualQueueGUIDlg::OnClickedButtonEnqueue()
@@ -186,9 +205,28 @@ void CVisualQueueGUIDlg::OnClickedButtonEnqueue()
 		
 		m_nEnqueueValue = ::rand() % 100;
 		UpdateData(FALSE);
+		CEdit* pEdit = (CEdit*)GetDlgItem(IDC_EDIT_ENQUEUE_VAL);
+		pEdit->SetSel(0, -1);
+		pEdit->SetFocus();
+
 	}
 }
 
+void CVisualQueueGUIDlg::OnClickedButtonDequeue()
+{
+	m_queueHelper.Dequeue();
+	_updateQueueContent();
+
+	int nDequeuedValue = m_queueHelper.GetLastDequeuedValue();
+	CString strTemp;
+
+	if (nDequeuedValue == -1) 
+	strTemp = _T("&Défiler(--)");
+	else
+	strTemp.Format(_T("&Défiler(%02d)"), nDequeuedValue);
+	
+	SetDlgItemText(IDC_BUTTON_DEQUEUE, strTemp);
+}
 
 void CVisualQueueGUIDlg::OnClickedButtonClear()
 {
@@ -197,17 +235,6 @@ void CVisualQueueGUIDlg::OnClickedButtonClear()
 	_updateQueueContent();
 
 }
-
-
-void CVisualQueueGUIDlg::OnClickedButtonDequeue()
-{
-	m_queueHelper.Dequeue();	
-	_updateQueueContent();
-	CString strTemp;
-	strTemp.Format(_T("&Défiler(%d)"), m_queueHelper.GetLastDequeuedValue());
-	SetDlgItemText(IDC_BUTTON_DEQUEUE, strTemp);
-}
-
 
 void CVisualQueueGUIDlg::OnClickedButtonGenerate()
 {
@@ -225,15 +252,21 @@ void CVisualQueueGUIDlg::OnClickedButtonGenerate()
 
 }
 
-
 void CVisualQueueGUIDlg::OnClickedButtonPeek()
 {
-	// TODO: Add your control notification handler code here	
-	m_queueHelper.Peek();
+	int nPeekedValue = m_queueHelper.Peek();
 	_updateQueueContent();
+
 	CString strTemp;
-	strTemp.Format(_T("&Peek(%d)"), m_queueHelper.GetLastPeekedValue());
+	
+
+	if(nPeekedValue==-1)
+		strTemp = _T("&Peek(--)");
+	else
+		strTemp.Format(_T("&Peek(%02d)"), nPeekedValue);
+
 	SetDlgItemText(IDC_BUTTON_PEEK, strTemp);
+
 	
 
 }
@@ -241,11 +274,17 @@ void CVisualQueueGUIDlg::OnClickedButtonPeek()
 void CVisualQueueGUIDlg::_updateQueueContent()
 {
 	SetDlgItemText(IDC_EDIT_QUEUE_CONTENT, m_queueHelper.GetTextRepresentation());
-	CString strQueue;
-	strQueue.Format(_T("&Queue(%d)"), m_queueHelper.GetQueueItemsCount());
-	SetDlgItemText(IDC_LBL_QUEUE, strQueue);
-	
 
+	int nItemsCount = m_queueHelper.GetQueueItemsCount();
+	CString strQueue;
+
+	if (nItemsCount == -1) 
+	strQueue = _T("&Queue(--)");
+	else 
+	strQueue.Format(_T("&Queue(%d)"), nItemsCount);
+
+
+	SetDlgItemText(IDC_LBL_QUEUE, strQueue);
 
 }
 

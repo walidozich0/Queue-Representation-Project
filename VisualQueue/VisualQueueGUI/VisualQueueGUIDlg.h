@@ -33,9 +33,12 @@ protected:
 	afx_msg void OnSysCommand(UINT nID, LPARAM lParam);
 	afx_msg void OnPaint();
 	afx_msg HCURSOR OnQueryDragIcon();
+	void OnOK();
 	DECLARE_MESSAGE_MAP()
 public:
-	afx_msg void OnClickedButtonEnqueue();
+	afx_msg
+	void OnCancel();
+	void OnClickedButtonEnqueue();
 	afx_msg void OnClickedButtonClear();
 	afx_msg void OnClickedButtonDequeue();
 	afx_msg void OnClickedButtonGenerate();
