@@ -47,6 +47,8 @@ BOOL CVisualQueueGUIApp::InitInstance()
 	InitCtrls.dwICC = ICC_WIN95_CLASSES;
 	InitCommonControlsEx(&InitCtrls);
 
+	GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, NULL);
+
 	CWinApp::InitInstance();
 	
 	
@@ -102,5 +104,11 @@ BOOL CVisualQueueGUIApp::InitInstance()
 	// Since the dialog has been closed, return FALSE so that we exit the
 	//  application, rather than start the application's message pump.
 	return FALSE;
+}
+
+BOOL CVisualQueueGUIApp::ExitInstance()
+{
+	GdiplusShutdown(gdiplusToken);
+	return CWinApp::ExitInstance();
 }
 

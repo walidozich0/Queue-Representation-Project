@@ -23,10 +23,15 @@ public:
 // Overrides
 public:
 	virtual BOOL InitInstance();
+	virtual BOOL ExitInstance();
 
 // Implementation
 
 	DECLARE_MESSAGE_MAP()
+
+private:
+	GdiplusStartupInput gdiplusStartupInput;
+	ULONG_PTR gdiplusToken;
 };
 
 extern CVisualQueueGUIApp theApp;

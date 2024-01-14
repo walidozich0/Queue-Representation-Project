@@ -10,4 +10,8 @@
 // add headers that you want to pre-compile here
 #include "framework.h"
 
+#include <gdiplus.h>
+using namespace Gdiplus;
+#pragma comment(lib, "gdiplus.lib")
+
 #endif //PCH_H

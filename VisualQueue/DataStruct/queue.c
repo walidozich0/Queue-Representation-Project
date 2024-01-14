@@ -3,8 +3,6 @@
 #include <windows.h>
 #include "../DataStruct/queue.h"
 
-
-
 // Fontion pour intialiser une file
 Queue* QueueInit()
 {
@@ -83,7 +81,6 @@ int peek(Queue* queue)
     return queue->m_pHeadEntry ? queue->m_pHeadEntry->m_nData : -1;
 }
 
-
 // Fonction pour vérifier si la file est vide
 int Queue_IsEmpty(Queue* queue) {
     if (queue->m_pHeadEntry == NULL) {
@@ -93,7 +90,6 @@ int Queue_IsEmpty(Queue* queue) {
         return 0;
     }
 }
-
 
 void Queue_Display(Queue* queue)
 {

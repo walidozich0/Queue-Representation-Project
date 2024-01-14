@@ -51,24 +51,26 @@ END_MESSAGE_MAP()
 
 // CVisualQueueGUIDlg dialog
 
-
-
 CVisualQueueGUIDlg::CVisualQueueGUIDlg(CWnd* pParent /*=nullptr*/)
 	: CDialogEx(IDD_VISUALQUEUEGUI_DIALOG, pParent)
-	, m_NbrEltsGenerate(5)
+	, m_NbrEltsGenerate(10)
 	, m_nEnqueueValue(0)
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 	TRACE("\r\n****** Conctructeur CVisualQueueGUIDlg\r\n");
+
+	m_queueDrawHelper.setQueueHelper(&m_queueHelper);
+	m_wndDrawCtrl.m_pQueueDrawHelper = &m_queueDrawHelper;
 }
 
 void CVisualQueueGUIDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
 	DDX_Text(pDX, IDC_EDIT_RAND_NBR_ELTS, m_NbrEltsGenerate);
-	DDV_MinMaxInt(pDX, m_NbrEltsGenerate, 1, 20);
+	DDV_MinMaxInt(pDX, m_NbrEltsGenerate, 1, m_queueHelper.GetQueueMaxItemsCount());
 	DDX_Text(pDX, IDC_EDIT_ENQUEUE_VAL, m_nEnqueueValue);
 	DDV_MinMaxInt(pDX, m_nEnqueueValue, 0, 99);
+	DDX_Control(pDX, IDC_DRAW_ZONE, m_wndDrawCtrl);
 }
 
 BEGIN_MESSAGE_MAP(CVisualQueueGUIDlg, CDialogEx)
@@ -121,14 +123,16 @@ BOOL CVisualQueueGUIDlg::OnInitDialog()
 	((CSpinButtonCtrl*)GetDlgItem(IDC_SPIN_NBR_ELTS))->SetRange(1, 20);
 
 	_updateQueueContent();
+
+	
+	m_wndDrawCtrl.ModifyStyle(0, SS_OWNERDRAW);
+
 	
 	
 	
 
 	return TRUE;  // return TRUE  unless you set the focus to a control
 }
-
-
 
 void CVisualQueueGUIDlg::OnSysCommand(UINT nID, LPARAM lParam)
 {
@@ -209,6 +213,8 @@ void CVisualQueueGUIDlg::OnClickedButtonEnqueue()
 		pEdit->SetSel(0, -1);
 		pEdit->SetFocus();
 
+		m_wndDrawCtrl.Invalidate();
+
 	}
 }
 
@@ -226,6 +232,7 @@ void CVisualQueueGUIDlg::OnClickedButtonDequeue()
 	strTemp.Format(_T("&Défiler(%02d)"), nDequeuedValue);
 	
 	SetDlgItemText(IDC_BUTTON_DEQUEUE, strTemp);
+	m_wndDrawCtrl.Invalidate();
 }
 
 void CVisualQueueGUIDlg::OnClickedButtonClear()
@@ -233,6 +240,7 @@ void CVisualQueueGUIDlg::OnClickedButtonClear()
 	// TODO: Add your control notification handler code here
 	m_queueHelper.FreeQueue();
 	_updateQueueContent();
+	m_wndDrawCtrl.Invalidate();
 
 }
 
@@ -245,6 +253,7 @@ void CVisualQueueGUIDlg::OnClickedButtonGenerate()
 		{
 			m_queueHelper.InitQueue(m_NbrEltsGenerate);
 			_updateQueueContent();
+			m_wndDrawCtrl.Invalidate();
 		}
 	}
 
@@ -256,6 +265,7 @@ void CVisualQueueGUIDlg::OnClickedButtonPeek()
 {
 	int nPeekedValue = m_queueHelper.Peek();
 	_updateQueueContent();
+	m_wndDrawCtrl.Invalidate();
 
 	CString strTemp;
 	
@@ -276,18 +286,15 @@ void CVisualQueueGUIDlg::_updateQueueContent()
 	SetDlgItemText(IDC_EDIT_QUEUE_CONTENT, m_queueHelper.GetTextRepresentation());
 
 	int nItemsCount = m_queueHelper.GetQueueItemsCount();
+	int nItemsMaxCount = m_queueHelper.GetQueueMaxItemsCount();
 	CString strQueue;
 
 	if (nItemsCount == -1) 
-	strQueue = _T("&Queue(--)");
+	strQueue = _T("&Queue(--/%d)", nItemsMaxCount);
 	else 
-	strQueue.Format(_T("&Queue(%d)"), nItemsCount);
+	strQueue.Format(_T("&Queue(%d/%d)"), nItemsCount, nItemsMaxCount);
 
 
 	SetDlgItemText(IDC_LBL_QUEUE, strQueue);
 
 }
-
-
-
-

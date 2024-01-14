@@ -6,6 +6,7 @@
 
 
 #include "QueueHelper.h"
+#include "VisualQueueDrawerCtrl.h"
 
 
 // CVisualQueueGUIDlg dialog
@@ -47,7 +48,10 @@ public:
 	int m_nEnqueueValue;
 private:
 	CQueueHelper  m_queueHelper;
+	CQueueDrawHelper m_queueDrawHelper;
 	void _updateQueueContent();
 
 	
+public:
+	CVisualQueueDrawerCtrl m_wndDrawCtrl;
 };

@@ -189,6 +189,7 @@
     <ClInclude Include="QueueHelper.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="targetver.h" />
+    <ClInclude Include="VisualQueueDrawerCtrl.h" />
     <ClInclude Include="VisualQueueGUI.h" />
     <ClInclude Include="VisualQueueGUIDlg.h" />
   </ItemGroup>
@@ -203,6 +204,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="QueueHelper.cpp" />
+    <ClCompile Include="VisualQueueDrawerCtrl.cpp" />
     <ClCompile Include="VisualQueueGUI.cpp" />
     <ClCompile Include="VisualQueueGUIDlg.cpp" />
   </ItemGroup>
