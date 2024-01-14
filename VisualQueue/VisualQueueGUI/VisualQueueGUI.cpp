@@ -1,4 +1,7 @@
+
 // VisualQueueGUI.cpp : Defines the class behaviors for the application.
+//
+
 #include "pch.h"
 #include "framework.h"
 #include "VisualQueueGUI.h"
@@ -8,24 +11,30 @@
 #define new DEBUG_NEW
 #endif
 
+
 // CVisualQueueGUIApp
+
 BEGIN_MESSAGE_MAP(CVisualQueueGUIApp, CWinApp)
 	ON_COMMAND(ID_HELP, &CWinApp::OnHelp)
 END_MESSAGE_MAP()
 
 
 // CVisualQueueGUIApp construction
+
 CVisualQueueGUIApp::CVisualQueueGUIApp()
 {
 	// TODO: add construction code here,
 	// Place all significant initialization in InitInstance
 }
 
+
 // The one and only CVisualQueueGUIApp object
+
 CVisualQueueGUIApp theApp;
 
 
 // CVisualQueueGUIApp initialization
+
 BOOL CVisualQueueGUIApp::InitInstance()
 {
 	// InitCommonControlsEx() is required on Windows XP if an application

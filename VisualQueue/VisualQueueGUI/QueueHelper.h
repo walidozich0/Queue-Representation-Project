@@ -49,37 +49,32 @@ private:
 class CQueueDrawHelper
 {
 public:
-	CQueueDrawHelper();
-
-	// set params
-	void setQueueHelper(CQueueHelper* pQH) { m_pQueueHelper = pQH; }
+	CQueueDrawHelper();		
 
 	// 
 	void Draw(CDC* pDC, CRect* pDrawCtrlRect);// CDC : Device Context
 
-
+	void OnInit(CQueueHelper* pQH,CWnd* pWnd);	
+	void OnResizeWindow();
 private:
 	// compute
 
 	CRect computeCanvasRect();
-
+	
 	CRect ComputeDequeueDataPos();//1
-
 	CRect ComputeDequeuedElementZone();//2	
 	CRect ComputeDequeuedElementPos();//3
 	CRect ComputeDequeuedElementAdrPos();//3
 	CRect ComputeDequeuedElementDataPos();//4
 	CRect ComputeDequeuedElementNextAdrPos();//5
-
-	CRect ComputeQueueZone();//6,7,13,14
 	
+	CRect ComputeQueueZone();//6,7,13,14	
 	
 	CRect ComputeHeadElementPos();//8
 	CRect ComputeHeadElementAdrPos();//8
 	CRect ComputeHeadElementDataPos();//9
 	CRect ComputeHeadElementNextAdrPos();//10
-
-
+	
 	CRect ComputeQueueElementPos(int index);//
 	CRect ComputeQueueElementAdrPos(int index);//
 	CRect ComputeQueueElementDataPos(int index);//
@@ -88,22 +83,19 @@ private:
 	CPoint ComputeQueueElementInArrowPosFromTail(int index);
 	CPoint ComputeQueueElementInArrowPosFromPrevElt(int index);
 	CPoint ComputeQueueElementOutArrowPos(int index);
-
-
-
+	
 	CRect ComputeEnqueuedElementZone();//2	
 	CRect ComputeEnqueuedElementPos();//3
 	CRect ComputeEnqueuedElementAdrPos();//3
 	CRect ComputeEnqueuedElementDataPos();//4
 	CRect ComputeEnqueuedElementNextAdrPos();//5
-
-
+	
 	CRect ComputeHeadPointerPos();//11
 	CPoint ComputeHeadPointerOutArrowPos();
+	
 	CRect ComputeTailPointerPos();//16
 	CPoint ComputeTailPointerOutArrowPos();
-
-
+	
 	CRect ComputePeekedDataPos();//12
 	CRect ComputeEnqueuedDataPos();//15
 
@@ -112,15 +104,18 @@ private:
 
 private:
 	CQueueHelper* m_pQueueHelper;
-	int m_nMarge;
 	
+	CWnd* m_pDrawingWindow;
+	
+	CRect m_rcDrawingWindowLogicalPosAndSize;
+	CRect m_rcDrawingWindowPhysicalPosAndSize;
+	
+	int m_nMarge;	
 	int m_nTopY;
 	int m_nBottomY;
-
 	int m_nDataWidth;
 	int m_nDataHeight;
 	int m_nDataDistanceFromQueue;
-
 	int m_nElementWidth;
 	int m_nElementHeight;
 	int m_nElementAdrHeight;
@@ -129,7 +124,7 @@ private:
 	CSize m_DrawUnitLength;	
 
 private:
-	void _computeUnitsConvParams(CRect* pRealRC, CRect* pLogicalRC);
+	void _computeUnitsConvParams();
 	RECT _convert(CRect* pRC);
 	CRect _logicalUnits2DeviceUnits(CRect* pRC);
 	CPoint _logicalUnits2DeviceUnits(CPoint* pPt);

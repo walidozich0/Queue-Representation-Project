@@ -9,9 +9,12 @@
 #include "afxdialogex.h"
 #include "QueueHelper.h"
 
+
+
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
+
 
 // CAboutDlg dialog used for App About
 
@@ -56,7 +59,7 @@ CVisualQueueGUIDlg::CVisualQueueGUIDlg(CWnd* pParent /*=nullptr*/)
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 	TRACE("\r\n****** Conctructeur CVisualQueueGUIDlg\r\n");
 
-	m_queueDrawHelper.setQueueHelper(&m_queueHelper);
+	
 	m_wndDrawCtrl.m_pQueueDrawHelper = &m_queueDrawHelper;
 }
 
@@ -80,6 +83,7 @@ BEGIN_MESSAGE_MAP(CVisualQueueGUIDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_BUTTON_GENERATE, &CVisualQueueGUIDlg::OnClickedButtonGenerate)
 	ON_BN_CLICKED(IDC_BUTTON_PEEK, &CVisualQueueGUIDlg::OnClickedButtonPeek)
 END_MESSAGE_MAP()
+
 
 // CVisualQueueGUIDlg message handlers
 
@@ -118,13 +122,13 @@ BOOL CVisualQueueGUIDlg::OnInitDialog()
 	// TODO: Add extra initialization here
 	((CSpinButtonCtrl*)GetDlgItem(IDC_SPIN_NBR_ELTS))->SetRange(1, 20);
 
-	_updateQueueContent();
+	
 
 	
+	m_queueDrawHelper.OnInit(&m_queueHelper, &m_wndDrawCtrl);
 	m_wndDrawCtrl.ModifyStyle(0, SS_OWNERDRAW);
 
-	
-	
+	_updateQueueContent();
 	
 
 	return TRUE;  // return TRUE  unless you set the focus to a control
@@ -176,6 +180,7 @@ HCURSOR CVisualQueueGUIDlg::OnQueryDragIcon()
 	return static_cast<HCURSOR>(m_hIcon);
 }
 
+
 void CVisualQueueGUIDlg::OnOK()
 {
 	int nFocusCtrlId = GetFocus()->GetDlgCtrlID();
@@ -188,12 +193,12 @@ void CVisualQueueGUIDlg::OnOK()
 	}
 
 }
-
 void CVisualQueueGUIDlg::OnCancel()
 {
 	if (AfxMessageBox(_T("Voulez vous quitter l'app"), MB_YESNO | MB_ICONQUESTION) == IDYES)
 		CDialogEx::OnCancel();
 }
+
 
 void CVisualQueueGUIDlg::OnClickedButtonEnqueue()
 {

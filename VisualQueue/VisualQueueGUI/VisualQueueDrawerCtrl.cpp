@@ -38,9 +38,15 @@ BOOL CVisualQueueDrawerCtrl::OnEraseBkgnd(CDC* pDC)
 	return FALSE;
 }
 
+void CVisualQueueDrawerCtrl::OnSize(UINT nType, int cx, int cy)
+{
+	if (m_pQueueDrawHelper) m_pQueueDrawHelper->OnResizeWindow();
+}
+
 
 BEGIN_MESSAGE_MAP(CVisualQueueDrawerCtrl, CStatic)
 	ON_WM_ERASEBKGND()
+	ON_WM_SIZE()
 END_MESSAGE_MAP()
 
 	

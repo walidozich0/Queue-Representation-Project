@@ -17,6 +17,7 @@ public:
 
 	virtual void DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct);
 	BOOL OnEraseBkgnd(CDC* pDC);
+	void OnSize(UINT nType,	int cx,	int cy);
 	
 
 protected:
