@@ -244,6 +244,19 @@ void CVisualQueueGUIDlg::OnClickedButtonDequeue()
 	
 	SetDlgItemText(IDC_BUTTON_DEQUEUE, strTemp);
 	m_wndDrawCtrl.Invalidate();
+	
+
+	if(UpdateData())
+	{
+		m_queueDrawHelper.EnableAnimation(m_bAnimationEnabled);		
+
+		if (m_queueDrawHelper.AnimationEnabled())
+		{
+			enableQueueCtrls(FALSE);			
+			m_queueDrawHelper.StartAnimationForDequeueOperation();
+		}
+	}
+
 }
 
 void CVisualQueueGUIDlg::OnClickedButtonClear()

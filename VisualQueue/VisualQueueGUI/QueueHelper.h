@@ -13,6 +13,7 @@ public:
 
 	CString GetTextRepresentation() { return m_strTextRepresentation; }
 	CString GetTextRepresentationEx() { return m_strTextRepresentationEx; }
+	CString GetLastDequeuedData() {	return m_strLastDequeuedData;}
 	BOOL IsQueueInitialized();
 	int GetQueueItemsCount();
 	int GetLastEnqueuedValue() { return m_nLastEnqueuedValue; }
@@ -43,6 +44,8 @@ private:
 	int m_nLastPeekedValue;
 
 	int m_nMaxItems;
+
+	CString m_strLastDequeuedData;
 };
 
 
@@ -86,6 +89,7 @@ public:
 	void EnableAnimation(BOOL bEnable) { m_bAnimationEnabled = bEnable; }
 	void  StartAnimationForPeekOperation();
 	void  StartAnimationForEnqueueOperation();
+	void  StartAnimationForDequeueOperation();
 
 private:
 	// compute
@@ -141,6 +145,9 @@ private:
 
 	void  _BuildAnimationForEnqueueOperation();
 	void  _DrawAnimationForEnqueueOperation(Graphics* pGraphics);
+
+	void  _BuildAnimationForDequeueOperation();
+	void  _DrawAnimationForDequeueOperation(Graphics* pGraphics);
 	
 	
 	

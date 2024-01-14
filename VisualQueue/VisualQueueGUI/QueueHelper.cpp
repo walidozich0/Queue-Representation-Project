@@ -61,6 +61,17 @@ int CQueueHelper::Peek()
 int CQueueHelper::Dequeue()
 {
 	if (!IsQueueInitialized()) return -1;
+	if (m_pQueue->m_nItemsCount > 0)
+	{
+		QueueEntry* pEntry = m_pQueue->m_pHeadEntry;
+		if (pEntry->m_pNextEntry)
+			m_strLastDequeuedData.Format(_T("%04X%02d%04X"), (WORD)pEntry, pEntry->m_nData, (WORD)(pEntry->m_pNextEntry));
+		else
+			m_strLastDequeuedData.Format(_T("%04X%02d0000"), (WORD)pEntry, pEntry->m_nData);
+	}	
+	else
+		m_strLastDequeuedData = _T("");
+
 	m_nLastDequeuedValue = ::Dequeue(m_pQueue);
 	_generateTextData();// regenerer la represenattion textuelle
 }
@@ -1182,6 +1193,90 @@ void CQueueDrawHelper::_DrawAnimationForEnqueueOperation(Graphics* pGraphics)
 }
 
 
+
+#define  ANIM_DEQOP_EXVAR_1_RC_HEADPOINTERPOS					301
+#define  ANIM_DEQOP_EXVAR_2_PT_HEADPOINTEROUTARROWPOS			302
+#define  ANIM_DEQOP_EXVAR_3_PT_QUEUEELEMENTINARROWPOSFROMHEADER	303
+#define  ANIM_DEQOP_EXVAR_4_RC_ELEMENTDATAPOS					304
+#define  ANIM_DEQOP_EXVAR_5_PT_ELEMENTDATAPOSOUTARROWPOS		305
+#define  ANIM_DEQOP_EXVAR_6_RC_DEQDATAPOS						306
+#define  ANIM_DEQOP_EXVAR_7_PT_INTERM							307
+
+#define ANIM_DEQOP_ID_0_START				300
+#define ANIM_DEQOP_ID_1_DATATRASF2			301
+#define ANIM_DEQOP_ID_2_DATATRASF3			302
+#define ANIM_DEQOP_ID_3_DATATRASF4			303
+
+#define ANIM_DEQOP_GRP_0_TEMPELT			300
+#define ANIM_DEQOP_GRP_1_DATATRASF1			301
+#define ANIM_DEQOP_GRP_2_DATATRASF2			302
+#define ANIM_DEQOP_GRP_3_DATATRASF3			303
+#define ANIM_DEQOP_GRP_4_FREEMEM			304
+
+
+#define ANIM_DEQOP_SEQ_MAIN 300
+
+
+
+
+
+void CQueueDrawHelper::_BuildAnimationForDequeueOperation()
+{
+	ASSERT(m_pQueueHelper);
+	if (m_pQueueHelper->GetQueueItemsCount() == 0)
+	{
+		ASSERT(FALSE);
+		return;
+	}
+
+	/*ComputeDequeuedElementDataPos();
+	ComputeDequeueDataPos();*/
+	
+
+	
+	Cleanup();	
+
+	// start
+	{
+		CAnimationValue* pAnimObj = DefineAnimationValue(ANIM_DEQOP_ID_0_START, ANIM_DEQOP_GRP_0_TEMPELT);
+		pAnimObj->AddTransition(new CInstantaneousTransition(1));//val
+	}
+	// transf 1 read value from temp elt
+	{
+		CAnimationValue* pAnimObj = DefineAnimationValue(ANIM_DEQOP_ID_1_DATATRASF2, ANIM_DEQOP_GRP_1_DATATRASF1,0,1,2);
+					
+	}
+
+	// transf 2 arrow transf
+	{
+
+	}
+
+	// transf 3 set valuue
+	{
+
+	}
+	
+	// liberation elts
+	{
+
+	}
+
+	DefineSequence(ANIM_DEQOP_SEQ_MAIN, ANIM_DEQOP_GRP_0_TEMPELT, ANIM_DEQOP_GRP_1_DATATRASF1);
+
+
+	
+}
+
+void CQueueDrawHelper::_DrawAnimationForDequeueOperation(Graphics* pGraphics)
+{
+	if (m_AnimMode != AnimMode::amDequeueOperation) return;
+	ASSERT(m_pDrawingWindow && m_pDrawingWindow->GetSafeHwnd());	
+
+
+}
+
+
 //////////////////// La methode Dessiner
 void CQueueDrawHelper::Draw()
 {
@@ -1194,6 +1289,11 @@ void CQueueDrawHelper::Draw()
 
 	// Fond blanc pour l'espace du dessin
 	graphics.FillRectangle(&m_backgroundBrush, 0, 0, m_rcDrawingWindowPhysicalPosAndSize.Width(), m_rcDrawingWindowPhysicalPosAndSize.Height());
+
+	// queue zone faux elt (dequeue)
+	int nOffsetForDeQueuedElt = 0;
+	if (m_AnimMode == AnimMode::amDequeueOperation) nOffsetForDeQueuedElt = m_nElementWidth + 2 * m_nMarge;
+
 
 	BOOL bDrawLastElt = TRUE;
 	if (m_AnimMode == AnimMode::amEnqueueOperation)
@@ -1253,6 +1353,7 @@ void CQueueDrawHelper::Draw()
 		if (m_pQueueHelper->GetLastEnqueuedValue() != -1)
 			strEnquedValue.Format(_T("%02d"), m_pQueueHelper->GetLastEnqueuedValue());
 		CRect rcLogical = ComputeEnqueuedDataPos();
+		rcLogical.OffsetRect(nOffsetForDeQueuedElt, 0);
 
 		if (m_AnimMode == AnimMode::amEnqueueOperation)
 		{
@@ -1313,6 +1414,8 @@ void CQueueDrawHelper::Draw()
 
 	{
 		CRect rcLogical = ComputeQueueZone();
+		rcLogical.right += nOffsetForDeQueuedElt;
+
 		if (m_AnimMode == AnimMode::amEnqueueOperation)
 		{
 			rcLogical.right -= (m_nElementWidth + 2 * m_nMarge);
@@ -1333,6 +1436,7 @@ void CQueueDrawHelper::Draw()
 
 	{
 		CRect rcLogical = ComputeEnqueuedElementZone();
+		rcLogical.OffsetRect(nOffsetForDeQueuedElt, 0);
 
 		if (m_AnimMode == AnimMode::amEnqueueOperation)
 		{
@@ -1347,6 +1451,7 @@ void CQueueDrawHelper::Draw()
 
 	{
 		CRect rcLogical = ComputeQueueExtraZone();
+		rcLogical.OffsetRect(nOffsetForDeQueuedElt, 0);
 
 		if (m_AnimMode == AnimMode::amEnqueueOperation)
 		{
@@ -1359,7 +1464,96 @@ void CQueueDrawHelper::Draw()
 		graphics.DrawLine(&m_dashedPen2, rcPhysical.left, rcPhysical.bottom, rcPhysical.right, rcPhysical.bottom);
 	}
 
-	// queue zone
+	
+
+	if(m_AnimMode == AnimMode::amDequeueOperation)
+	{
+		CString strCurrentData = m_pQueueHelper->GetLastDequeuedData();
+		ASSERT(strCurrentData.GetLength() == 10);
+
+		{
+			CRect rcLogical = ComputeQueueElementPos(0);
+			CRect rcPhysical = _logicalUnits2DeviceUnits(&rcLogical);
+			graphics.FillRectangle(&m_backgroundBrushElt, rcPhysical.left, rcPhysical.top, rcPhysical.Width(), rcPhysical.Height());
+			graphics.DrawRectangle(&m_normalPen, rcPhysical.left, rcPhysical.top, rcPhysical.Width(), rcPhysical.Height());
+		}
+		{
+			CRect rcLogical = ComputeQueueElementAdrPos(0);
+			CRect rcPhysical = _logicalUnits2DeviceUnits(&rcLogical);
+			graphics.FillRectangle(&m_backgroundBrushAdr, rcPhysical.left, rcPhysical.top, rcPhysical.Width(), rcPhysical.Height());
+			graphics.DrawRectangle(&m_normalPen, rcPhysical.left, rcPhysical.top, rcPhysical.Width(), rcPhysical.Height());
+			/*graphics.DrawString(strCurrentData.Left(4), -1, &m_font,
+				RectF(rcPhysical.left, rcPhysical.top, rcPhysical.Width(), rcPhysical.Height()), NULL, &m_solidBrush);*/
+			_helperDrawTextCentered(&graphics, strCurrentData.Left(4), -1, rcPhysical, &m_font, &m_solidBrush);
+		}
+		{
+			CRect rcLogical = ComputeQueueElementDataPos(0);
+			CRect rcPhysical = _logicalUnits2DeviceUnits(&rcLogical);
+			graphics.FillEllipse(&m_backgroundBrushData, rcPhysical.left, rcPhysical.top, rcPhysical.Width(), rcPhysical.Height());
+			graphics.DrawEllipse(&m_DataPen, rcPhysical.left, rcPhysical.top, rcPhysical.Width(), rcPhysical.Height());
+			/*graphics.DrawString(strCurrentData.Mid(4, 2), -1, &m_font,
+				RectF(rcPhysical.left, rcPhysical.top, rcPhysical.Width(), rcPhysical.Height()), NULL, &m_solidBrush);*/
+			CString strText = strCurrentData.Mid(4, 2);
+			_helperDrawTextCentered(&graphics, strText, -1, rcPhysical, &m_font, &m_solidBrush);
+		}
+
+		{
+			CRect rcLogical = ComputeQueueElementNextAdrPos(0);
+			CRect rcPhysical = _logicalUnits2DeviceUnits(&rcLogical);
+			CString strCompareZero = _T("0000");
+
+			graphics.FillRectangle(&m_backgroundBrushAdrSuiv, rcPhysical.left, rcPhysical.top, rcPhysical.Width(), rcPhysical.Height());
+			graphics.DrawRectangle(&m_normalPen, rcPhysical.left, rcPhysical.top, rcPhysical.Width(), rcPhysical.Height());
+
+			if ((strCurrentData.Right(4) == strCompareZero))
+			{			
+				graphics.DrawLine(&m_normalPen, rcPhysical.left, rcPhysical.top, rcPhysical.right, rcPhysical.bottom);
+			}
+			else {
+				/*graphics.DrawString(strCurrentData.Right(4), -1, &m_font,
+					RectF(rcPhysical.left, rcPhysical.top, rcPhysical.Width(), rcPhysical.Height()), NULL, &m_solidBrush);*/
+				_helperDrawTextCentered(&graphics, strCurrentData.Right(4), -1, rcPhysical, &m_font, &m_solidBrush);
+			}
+		}
+
+		if (m_pQueueHelper->GetQueueItemsCount()>0)
+		{
+			CPoint ptStartLogical = ComputeQueueElementOutArrowPos(0);			
+			CPoint ptEndLogical = ptStartLogical;
+			ptEndLogical.x += 2* m_nMarge;
+			ptEndLogical.y -= (m_nElementHeight-m_nElementAdrHeight);
+
+			CPoint ptInterm1Logical = ptStartLogical;
+			ptInterm1Logical.Offset((ptEndLogical.x - ptStartLogical.x) / 2, 0);
+			CPoint ptInterm2Logical = ptEndLogical;
+			ptInterm2Logical.Offset(-(ptEndLogical.x - ptStartLogical.x) / 2, 0);
+
+
+
+			CPoint ptStartPhysical = _logicalUnits2DeviceUnits(&ptStartLogical);
+			CPoint ptEndPhysical = _logicalUnits2DeviceUnits(&ptEndLogical);
+			CPoint ptInterm1Physical = _logicalUnits2DeviceUnits(&ptInterm1Logical);
+			CPoint ptInterm2Physical = _logicalUnits2DeviceUnits(&ptInterm2Logical);
+
+			//graphics.DrawLine(&arrowPen, ptStartPhysical.x, ptStartPhysical.y, ptEndPhysical.x, ptEndPhysical.y);
+
+			Point pointsColl[4] = { Point(),Point(),Point(),Point() };
+			pointsColl[0].X = ptStartPhysical.x; pointsColl[0].Y = ptStartPhysical.y;
+			pointsColl[1].X = ptInterm1Physical.x; pointsColl[1].Y = ptInterm1Physical.y;
+			pointsColl[2].X = ptInterm2Physical.x; pointsColl[2].Y = ptInterm2Physical.y;
+			pointsColl[3].X = ptEndPhysical.x; pointsColl[3].Y = ptEndPhysical.y;
+
+
+			//graphics.DrawLines(&arrowPen, pointsColl,4);
+			graphics.DrawCurve(&m_arrowPen, pointsColl, 4);
+			//graphics.DrawBeziers(&arrowPen, pointsColl, 4);
+
+		}
+
+	}
+
+	
+
 	for (int i = 0; i < m_pQueueHelper->GetQueueItemsCount(); i++)
 	{
 		if (m_AnimMode == AnimMode::amEnqueueOperation)
@@ -1373,12 +1567,14 @@ void CQueueDrawHelper::Draw()
 
 		{
 			CRect rcLogical = ComputeQueueElementPos(i);
+			rcLogical.OffsetRect(nOffsetForDeQueuedElt, 0);
 			CRect rcPhysical = _logicalUnits2DeviceUnits(&rcLogical);
 			graphics.FillRectangle(&m_backgroundBrushElt, rcPhysical.left, rcPhysical.top, rcPhysical.Width(), rcPhysical.Height());
 			graphics.DrawRectangle(&m_normalPen, rcPhysical.left, rcPhysical.top, rcPhysical.Width(), rcPhysical.Height());
 		}
 		{
 			CRect rcLogical = ComputeQueueElementAdrPos(i);
+			rcLogical.OffsetRect(nOffsetForDeQueuedElt, 0);
 			CRect rcPhysical = _logicalUnits2DeviceUnits(&rcLogical);
 			graphics.FillRectangle(&m_backgroundBrushAdr, rcPhysical.left, rcPhysical.top, rcPhysical.Width(), rcPhysical.Height());
 			graphics.DrawRectangle(&m_normalPen, rcPhysical.left, rcPhysical.top, rcPhysical.Width(), rcPhysical.Height());
@@ -1388,6 +1584,7 @@ void CQueueDrawHelper::Draw()
 		}
 		{
 			CRect rcLogical = ComputeQueueElementDataPos(i);
+			rcLogical.OffsetRect(nOffsetForDeQueuedElt, 0);
 			CRect rcPhysical = _logicalUnits2DeviceUnits(&rcLogical);
 			graphics.FillEllipse(&m_backgroundBrushData, rcPhysical.left, rcPhysical.top, rcPhysical.Width(), rcPhysical.Height());
 			graphics.DrawEllipse(&m_DataPen, rcPhysical.left, rcPhysical.top, rcPhysical.Width(), rcPhysical.Height());
@@ -1408,6 +1605,7 @@ void CQueueDrawHelper::Draw()
 
 		{
 			CRect rcLogical = ComputeQueueElementNextAdrPos(i);
+			rcLogical.OffsetRect(nOffsetForDeQueuedElt, 0);
 			CRect rcPhysical = _logicalUnits2DeviceUnits(&rcLogical);
 			CString strCompareZero = _T("0000");
 			
@@ -1446,6 +1644,9 @@ void CQueueDrawHelper::Draw()
 
 			CPoint ptStartLogical = ComputeQueueElementOutArrowPos(i);
 			CPoint ptEndLogical = ComputeQueueElementInArrowPosFromPrevElt(i + 1);
+			
+			ptStartLogical.x += nOffsetForDeQueuedElt;
+			ptEndLogical.x += nOffsetForDeQueuedElt;
 
 			CPoint ptInterm1Logical = ptStartLogical;
 			ptInterm1Logical.Offset((ptEndLogical.x - ptStartLogical.x) / 2, 0);
@@ -1500,6 +1701,7 @@ void CQueueDrawHelper::Draw()
 	// Tail Pointer
 	{
 		CRect rcLogical = ComputeTailPointerPos();
+		rcLogical.OffsetRect(nOffsetForDeQueuedElt, 0);
 		CAnimationValue* pAnimValue = NULL;
 		if (m_AnimMode == AnimMode::amEnqueueOperation)
 		{
@@ -1540,6 +1742,9 @@ void CQueueDrawHelper::Draw()
 			CPoint ptStartLogical = ComputeTailPointerOutArrowPos();
 			CPoint ptEndLogical = ComputeQueueElementInArrowPosFromTail(m_pQueueHelper->GetQueueItemsCount() - 1);
 
+			ptStartLogical.x += nOffsetForDeQueuedElt;
+			ptEndLogical.x += nOffsetForDeQueuedElt;
+
 			if (m_AnimMode == AnimMode::amEnqueueOperation)
 			{
 				ptStartLogical.x -= (m_nElementWidth + 2 * m_nMarge);
@@ -1566,6 +1771,7 @@ void CQueueDrawHelper::Draw()
 	{
 		_DrawAnimationForPeekOperation(&graphics);
 		_DrawAnimationForEnqueueOperation(&graphics);
+		_DrawAnimationForDequeueOperation(&graphics);
 
 	}
 
@@ -1575,7 +1781,7 @@ void CQueueDrawHelper::Draw()
 void CQueueDrawHelper::StartAnimationForPeekOperation()
 {	
 	if (!m_bAnimationEnabled) return;
-	if (m_pQueueHelper->GetLastPeekedValue() == -1) return;
+	if (m_pQueueHelper->GetQueueItemsCount()==0) return;
 	_BuildAnimationForPeekOperation();
 	m_AnimMode = AnimMode::amPeekOperation;
 	AnimateSequence(ANIM_PEEKOP_SEQ_MAIN);	
@@ -1588,6 +1794,15 @@ void CQueueDrawHelper::StartAnimationForEnqueueOperation()
 	_BuildAnimationForEnqueueOperation();
 	m_AnimMode = AnimMode::amEnqueueOperation;
 	AnimateSequence(ANIM_ENQOP_SEQ_MAIN);
+}
+
+void CQueueDrawHelper::StartAnimationForDequeueOperation()
+{
+	if (!m_bAnimationEnabled) return;
+	if (m_pQueueHelper->GetQueueItemsCount() == 0) return;
+	_BuildAnimationForDequeueOperation();
+	m_AnimMode = AnimMode::amDequeueOperation;
+	AnimateSequence(ANIM_DEQOP_SEQ_MAIN);
 }
 
 void CQueueDrawHelper::OnAllAnimationsDone()
