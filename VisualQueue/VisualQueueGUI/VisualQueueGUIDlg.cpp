@@ -55,7 +55,7 @@ CVisualQueueGUIDlg::CVisualQueueGUIDlg(CWnd* pParent /*=nullptr*/)
 	: CDialogEx(IDD_VISUALQUEUEGUI_DIALOG, pParent)
 	, m_NbrEltsGenerate(10)
 	, m_nEnqueueValue(0)
-	, m_bAnimationEnabled(FALSE)
+	, m_bAnimationEnabled(TRUE)
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 	TRACE("\r\n****** Conctructeur CVisualQueueGUIDlg\r\n");
@@ -198,20 +198,21 @@ void CVisualQueueGUIDlg::OnCancel()
 
 void CVisualQueueGUIDlg::OnClickedButtonEnqueue()
 {
-	if (UpdateData())
-	{
-		m_queueHelper.Enqueue(m_nEnqueueValue);
-		_updateQueueContent();
+	if (!UpdateData())
+		return;
+
+	m_queueHelper.Enqueue(m_nEnqueueValue);
+	_updateQueueContent();
 		
-		m_nEnqueueValue = ::rand() % 100;
-		UpdateData(FALSE);
-		CEdit* pEdit = (CEdit*)GetDlgItem(IDC_EDIT_ENQUEUE_VAL);
-		pEdit->SetSel(0, -1);
-		pEdit->SetFocus();
+	m_nEnqueueValue = ::rand() % 100;
+	UpdateData(FALSE);
+	CEdit* pEdit = (CEdit*)GetDlgItem(IDC_EDIT_ENQUEUE_VAL);
+	pEdit->SetSel(0, -1);
+	pEdit->SetFocus();
 
-		m_wndDrawCtrl.Invalidate();
-
-	}
+	m_queueDrawHelper.EnableAnimation(m_bAnimationEnabled);
+	m_wndDrawCtrl.Invalidate();
+	if(m_bAnimationEnabled) m_queueDrawHelper.StartAnimationForEnqueueOperation();
 }
 
 void CVisualQueueGUIDlg::OnClickedButtonDequeue()
@@ -259,7 +260,7 @@ void CVisualQueueGUIDlg::OnClickedButtonGenerate()
 
 void CVisualQueueGUIDlg::OnClickedButtonPeek()
 {
-	UpdateData(TRUE);
+	if (!UpdateData(TRUE)) return;
 	int nPeekedValue = m_queueHelper.Peek();
 	_updateQueueContent();
 	m_wndDrawCtrl.Invalidate();

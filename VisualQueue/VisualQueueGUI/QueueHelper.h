@@ -83,6 +83,7 @@ public:
 	BOOL AnimationEnabled() { return m_bAnimationEnabled; }
 	void EnableAnimation(BOOL bEnable) { m_bAnimationEnabled = bEnable; }
 	void  StartAnimationForPeekOperation();
+	void  StartAnimationForEnqueueOperation();
 
 private:
 	// compute
@@ -135,6 +136,9 @@ public:
 private:	
 	void  _BuildAnimationForPeekOperation();
 	void  _DrawAnimationForPeekOperation(Graphics* pGraphics);
+
+	void  _BuildAnimationForEnqueueOperation();
+	void  _DrawAnimationForEnqueueOperation(Graphics* pGraphics);
 	
 	
 	
